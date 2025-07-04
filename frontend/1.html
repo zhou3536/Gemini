@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10种CSS加载条动画</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC&display=swap" rel="stylesheet">
+    <style>
+        /* 页面基本样式 */
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h2 {
+            margin-top: 50px;
+            margin-bottom: 25px;
+            color: #9e9e9e;
+            font-weight: normal;
+            border-left: 3px solid #4CAF50;
+            padding-left: 10px;
+        }
+
+        /* 加载条的通用基础样式 */
+        .loading-bar {
+            position: relative; /* 相对于 h2 标题定位 */
+            width: 100%;
+            height: 2px;
+            background-color: #333; /* 底色，让渐变效果更明显 */
+            overflow: hidden; /* 隐藏超出部分 */
+        }
+
+        .loading-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* 动画将在这里定义 */
+        }
+        
+        /* 动画关键帧 - 核心移动逻辑 */
+        @keyframes move-gradient {
+            0% {
+                background-position: 100% 0;
+            }
+            100% {
+                background-position: -100% 0;
+            }
+        }
+
+        /* --- 10种不同风格的加载条 --- */
+
+        /* 1. 经典彩虹色 */
+        .bar-1::before {
+            background: linear-gradient(to right, #ffbe0b, #fb5607, #ff006e, #8338ec, #3a86ff);
+            background-size: 200% 100%;
+            animation: move-gradient 2s linear infinite;
+        }
+
+        /* 2. 柔和的蓝色辉光 */
+        .bar-2::before {
+            background: linear-gradient(to right, #1a1a1a, #4dabf7, #1a1a1a);
+            background-size: 200% 100%;
+            animation: move-gradient 1.5s ease-in-out infinite;
+        }
+
+        /* 3. 科技感电光绿 */
+        .bar-3::before {
+            background: linear-gradient(90deg, transparent, #00ffc3, transparent);
+            background-size: 400% 100%; /* 更大的尺寸让光束更细 */
+            animation: move-gradient 1.2s linear infinite;
+        }
+
+        /* 4. 热情的火焰色 */
+        .bar-4::before {
+            background: linear-gradient(to right, #ff4e00, #fccc63, #ff4e00);
+            background-size: 200% 100%;
+            animation: move-gradient 2.5s cubic-bezier(0.65, 0.05, 0.36, 1) infinite;
+        }
+
+        /* 5. 警示条纹（斜向）*/
+        .bar-5 { height: 3px; } /* 条纹效果加粗一点更好看 */
+        .bar-5::before {
+            background: repeating-linear-gradient(
+                90deg, 
+                #ffd60a, 
+                #0ac6ff 30px, 
+                #ffd60a 90px
+            );
+            background-size: 200% 200%;
+            animation: move-gradient 10s linear infinite;
+        }
+
+        /* 6. 硬朗的色块移动 */
+        .bar-6::before {
+            background: linear-gradient(to right, #e63946 25%, #f1faee 25%, #f1faee 50%, #a8dadc 50%, #a8dadc 75%, #457b9d 75%);
+            background-size: 400% 100%;
+            animation: move-gradient 3s steps(4, end) infinite; /* 使用steps让移动变成跳跃式 */
+        }
+
+        /* 7. 反向移动的紫色梦幻 */
+        .bar-7::before {
+            background: linear-gradient(to left, #6a0dad, #c471ed, #f64f59); /* 注意 "to left" */
+            background-size: 200% 100%;
+            animation: move-gradient 2s linear infinite;
+        }
+
+        /* 8. 优雅的金色微光 (速度较慢) */
+        .bar-8::before {
+            background: linear-gradient(to right, transparent, #f0e68c, transparent);
+            background-size: 500% 100%;
+            animation: move-gradient 4s linear infinite;
+            animation-delay: 0.5s; /* 延迟0.5秒开始 */
+        }
+        
+        /* 9. 双色霓虹 */
+        .bar-9 { height: 3px; }
+        .bar-9::before {
+            background: linear-gradient(90deg, #f80759, #bc4e9c, #f80759);
+            background-size: 200% 100%;
+            animation: move-gradient 1.8s ease-in-out infinite;
+        }
+
+        /* 10. 极简白光（在暗色背景上效果好） */
+        .bar-10::before {
+            background: linear-gradient(to right, #1a1a1a 40%, #ffffff 50%, #1a1a1a 60%);
+            background-size: 300% 100%;
+            animation: move-gradient 2.2s linear infinite;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>10种CSS渐变加载条动画</h1>
+
+    <h2>1. 经典彩虹色</h2>
+    <div class="loading-bar bar-1"></div>
+
+    <h2>2. 柔和的蓝色辉光</h2>
+    <div class="loading-bar bar-2"></div>
+
+    <h2>3. 科技感电光绿</h2>
+    <div class="loading-bar bar-3"></div>
+
+    <h2>4. 热情的火焰色</h2>
+    <div class="loading-bar bar-4"></div>
+
+    <h2>5. 警示条纹（斜向）</h2>
+    <div class="loading-bar bar-5"></div>
+    
+    <h2>6. 硬朗的色块移动</h2>
+    <div class="loading-bar bar-6"></div>
+
+    <h2>7. 反向移动的紫色梦幻</h2>
+    <div class="loading-bar bar-7"></div>
+
+    <h2>8. 优雅的金色微光 (速度较慢)</h2>
+    <div class="loading-bar bar-8"></div>
+
+    <h2>9. 双色霓虹</h2>
+    <div class="loading-bar bar-9"></div>
+
+    <h2>10. 极简白光</h2>
+    <div class="loading-bar bar-10"></div>
+
+</body>
+</html>

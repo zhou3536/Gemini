@@ -83,11 +83,13 @@ app.post('/api/chat', upload.single('file'), async (req, res) => {
         const response = result.response;
         const text = response.text();
 
-        // 从 chat 会话中获取由 SDK 管理的完整、最新的历史记录
-        const updatedHistory = await chat.getHistory();
-        // 使用权威的最新历史记录进行保存
+        // 更新历史记录
+        history.push({ role: 'user', parts: userParts });
+        history.push({ role: 'model', parts: [{ text }] });
+
+        // 实时保存
         const historyPath = path.join(HISTORIES_DIR, `${chatId}.json`);
-        await fs.writeFile(historyPath, JSON.stringify(updatedHistory, null, 2));
+        await fs.writeFile(historyPath, JSON.stringify(history, null, 2));
 
         res.json({ reply: text, chatId });
     } catch (error) {
