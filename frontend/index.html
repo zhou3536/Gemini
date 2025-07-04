@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Gemini Chat</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="md.css">
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <button id="new-chat-btn">新建对话</button>
+            <ul id="history-list"></ul>
+        </aside>
+        <main class="chat-area">
+            <div id="chat-window">
+                <div class="message welcome-message">
+                    <p>你好！有什么可以帮你的吗？</p>
+                </div>
+            </div>
+            <div id="loading-indicator" class="hidden"></div>
+            <div class="input-area">
+
+                <textarea id="prompt-input" placeholder="输入消息..." rows="3"></textarea>
+
+                <input type="file" id="file-input" hidden>
+                <div class="send-box">
+                    <div id="file-preview-container"></div>
+                    <div style="display: grid;gap: 5px;">
+                        <button id="send-btn" class="send-btn">发送</button>
+                        <label for="file-input" class="send-btn">文件</label>
+
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="md.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
