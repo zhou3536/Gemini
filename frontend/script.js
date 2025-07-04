@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof marked !== 'undefined' && typeof hljs !== 'undefined') {
         marked.setOptions({
             // 这里的 highlight 函数告诉 marked 如何高亮代码
-            highlight: function(code, lang) {
+            highlight: function (code, lang) {
                 // 检查语言是否在 highlight.js 中注册，否则使用纯文本
                 const language = hljs.getLanguage(lang) ? lang : 'plaintext';
                 return hljs.highlight(code, { language }).value;
             },
             // marked 生成的代码块的类前缀，以便 highlight.js 的 CSS 可以识别
-            langPrefix: 'hljs language-', 
+            langPrefix: 'hljs language-',
             gfm: true, // 启用 GitHub Flavored Markdown (表格、任务列表等)
             breaks: true // 允许 Markdown 中的换行符渲染为 <br>
         });
@@ -45,20 +45,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const p = document.createElement('p');
             // 注意：textContent 会自动转义 HTML 字符，防止XSS攻击
             // 如果用户输入中也包含需要解析的Markdown，这里也需要用 marked.parse，但通常不建议对用户输入直接使用 innerHTML
-            p.textContent = text; 
+            p.textContent = text;
             messageDiv.appendChild(p);
         }
-        
+
         chatWindow.appendChild(messageDiv);
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
-    
+
     // 渲染整个消息历史 (保持不变，因为 renderMessage 会处理Markdown)
     function renderChatHistory(messages) {
         chatWindow.innerHTML = '';
         if (!messages || messages.length === 0) {
-             renderMessage('gemini', '你好！新对话已开始。'); // 更改了欢迎语末尾的字符，防止误解
-             return;
+            renderMessage('gemini', '你好！新对话已开始。'); // 更改了欢迎语末尾的字符，防止误解
+            return;
         }
         messages.forEach(msg => {
             const text = msg.parts.find(p => p.text)?.text || '';
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ... (其他函数保持不变，例如 setLoading, fetchAndRenderHistory, loadChatHistory, sendMessage) ...
-    
+
     // 设置加载状态
     function setLoading(isLoading) {
         sendBtn.disabled = isLoading;
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setLoading(true);
         // 对于用户发送的消息，通常不需要进行Markdown解析，直接显示原文
-        renderMessage('user', prompt || `已发送文件: ${currentFile.name}`); 
+        renderMessage('user', prompt || `已发送文件: ${currentFile.name}`);
         promptInput.value = '';
         filePreviewContainer.innerHTML = '';
 
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const chatJustCreated = !currentChatId;
             currentChatId = data.chatId;
-            
+
             if (chatJustCreated) {
                 fetchAndRenderHistory();
             }
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setLoading(false);
         }
     }
-    
+
     // --- 事件监听 ---
     sendBtn.addEventListener('click', sendMessage);
     promptInput.addEventListener('keydown', (e) => {
