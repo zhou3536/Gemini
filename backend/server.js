@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
+const host = '127.0.0.1';
 
 // __dirname 在 ES Module 中不可用，需要手动创建
 const __filename = fileURLToPath(import.meta.url);
@@ -30,7 +31,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // --- Gemini AI 配置 ---
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
+const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
 // --- 辅助函数 ---
 // 将 Buffer 转为 Gemini API 接受的格式
@@ -177,10 +178,8 @@ app.delete('/api/history/:chatId', async (req, res) => {
     }
 });
 
-
 // --- 启动服务器 ---
-app.listen(port, () => {
-    // 确保 histories 目录存在
+app.listen(port, host, () => {
     fs.mkdir(HISTORIES_DIR, { recursive: true });
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`正在监听：http://${host}:${port}`);
 });
