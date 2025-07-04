@@ -97,7 +97,6 @@ body {
     margin-bottom: 1px;
     padding: 8px 20px;
     line-height: 1.2;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .message p {
@@ -109,7 +108,7 @@ body {
 }
 
 .gemini-message {
-    background-color: #f1f0f0;
+    background-color: transparent;
     /* align-self: flex-start; */
 }
 
@@ -121,6 +120,7 @@ body {
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
+    margin-top: 6px;
     padding: 8px;
     border: 1px solid #ddd;
     align-items: center;
