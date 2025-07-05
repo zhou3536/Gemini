@@ -1,5 +1,6 @@
 // backend/server.js
 
+// --- 模块导入 (统一使用 ES Modules) ---
 import express from 'express';
 import multer from 'multer';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -11,27 +12,28 @@ import { fileURLToPath } from 'url';
 
 // --- 配置 ---
 dotenv.config();
-const app = express();
-const port = process.env.PORT || 3001;
-const host = '127.0.0.1';
 
 // __dirname 在 ES Module 中不可用，需要手动创建
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const app = express();
+const port = process.env.PORT || 3001;
+const host = '127.0.0.1';
 const HISTORIES_DIR = path.join(__dirname, 'histories');
-
-// --- 中间件 ---
-app.use(cors()); // 允许跨域请求
-app.use(express.json()); // 解析JSON请求体
-app.use(express.static(path.join(__dirname, '../frontend'))); // 托管前端静态文件
 
 // Multer 配置，用于处理文件上传（保存在内存中）
 const upload = multer({ storage: multer.memoryStorage() });
 
-// --- Gemini AI 配置 ---
+// Gemini AI 配置
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+// --- 中间件 ---
+app.use(cors()); // 允许跨域请求
+app.use(express.json()); // 解析JSON请求体
+// 注意：路径通常指向构建后的前端目录，例如 'dist' 或 'build'
+// 如果你的前端文件就在 frontend 目录下，这个路径是正确的
+app.use(express.static(path.join(__dirname, '..', 'frontend'))); 
 
 // --- 辅助函数 ---
 // 将 Buffer 转为 Gemini API 接受的格式
@@ -49,120 +51,114 @@ function fileToGenerativePart(buffer, mimeType) {
 // 核心聊天接口
 app.post('/api/chat', upload.single('file'), async (req, res) => {
     try {
-        const { prompt, chatId: existingChatId } = req.body;
-        const file = req.file;
-        // 1. 设置SSE响应头
+        // 1. 从请求体中获取 prompt, chatId, 以及前端传来的 model
+        const { prompt, chatId } = req.body;
+        const modelName = req.body.model; // 获取模型名称，若无则使用默认值
+
+        console.log(`Using model: ${modelName} for chat: ${chatId || 'New Chat'}`);
+
+        // 2. 使用动态的模型名称初始化 Gemini 模型
+        const model = genAI.getGenerativeModel({ model: modelName });
+
+        // 3. 根据 chatId 加载或创建聊天历史
+        let history = [];
+        if (chatId) {
+            try {
+                const historyPath = path.join(HISTORIES_DIR, `${chatId}.json`);
+                const data = await fs.readFile(historyPath, 'utf-8');
+                history = JSON.parse(data);
+             } catch (e) {
+                console.log(`History for ${chatId} not found. Starting a new chat.`);
+             }
+        }
+        
+        const chat = model.startChat({ history });
+
+        // 4. 准备要发送给模型的内容（prompt 和 文件）
+        const messageParts = [{ text: prompt }];
+        if (req.file) {
+            const filePart = fileToGenerativePart(req.file.buffer, req.file.mimetype);
+            messageParts.push(filePart);
+        }
+        
+        // 5. 发送请求并以流的形式获取结果
+        const result = await chat.sendMessageStream(messageParts);
+
+        // 6. 设置响应头以支持 SSE (Server-Sent Events)
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
-        res.flushHeaders(); 
-        let history = [];
-        let chatId = existingChatId;
-        // 2. 提前处理 chatId 和 history
-        if (chatId) {
-            const historyPath = path.join(HISTORIES_DIR, `${chatId}.json`);
-            try {
-                const historyData = await fs.readFile(historyPath);
-                history = JSON.parse(historyData);
-            } catch (error) {
-                console.log(`History file for ${chatId} not found. Starting new chat.`);
-                chatId = Date.now().toString();
-            }
-        } else {
-            chatId = Date.now().toString();
-        }
-        const userParts = [{ text: prompt }];
-        if (file) {
-            userParts.unshift(fileToGenerativePart(file.buffer, file.mimetype));
-        }
-        const chat = model.startChat({ history });
-        const result = await chat.sendMessageStream(userParts);
-        // --- 关键改动在这里 ---
-        // 3. 创建一个变量来手动聚合所有AI响应的文本块
-        let fullResponseText = '';
-        // 4. 迭代流，既发送数据块给前端，也聚合文本到我们自己的变量中
+
+        const newChatId = chatId || `${Date.now()}`; // 如果是新对话，生成一个基于时间戳的ID
+
         for await (const chunk of result.stream) {
             const chunkText = chunk.text();
-            fullResponseText += chunkText; // <-- 手动聚合
-            const payload = {
+            const responseData = {
                 reply: chunkText,
-                chatId: chatId
+                chatId: newChatId, 
             };
-            res.write(`data: ${JSON.stringify(payload)}\n\n`);
+            res.write(`data: ${JSON.stringify(responseData)}\n\n`);
         }
-        // 5. 流结束后，手动构建要保存的完整历史记录
-        //    a. 添加用户的提问到历史中
-        history.push({
-            role: 'user',
-            parts: userParts
-        });
-        //    b. 添加AI完整的、聚合后的回答到历史中
-        history.push({
-            role: 'model',
-            parts: [{ text: fullResponseText }] // <-- 使用我们自己聚合的完整文本
-        });
-        // 6. 将构建好的、格式正确的完整历史记录写入文件
-        const historyPath = path.join(HISTORIES_DIR, `${chatId}.json`);
-        // `history` 现在是一个包含所有对话轮次的、格式正确的数组
-        await fs.writeFile(historyPath, JSON.stringify(history, null, 2));
-        // 7. 结束响应流
-        res.end();
+        
+        // 7. 对话结束后，获取完整的历史记录并保存到文件
+        const updatedHistory = await chat.getHistory();
+        const newFilePath = path.join(HISTORIES_DIR, `${newChatId}.json`);
+        await fs.writeFile(newFilePath, JSON.stringify(updatedHistory, null, 2));
+
+        res.end(); // 结束响应
+
     } catch (error) {
-        console.error('Chat API error:', error);
-        const errorPayload = { error: 'Failed to get response from Gemini.' };
-        if (!res.headersSent) {
-            res.status(500).json(errorPayload);
-        } else {
-            res.write(`data: ${JSON.stringify(errorPayload)}\n\n`);
-            res.end();
-        }
+        console.error('Chat API Error:', error);
+        // 如果出错，也通过 SSE 发送错误信息给前端
+        res.status(500).write(`data: ${JSON.stringify({ error: `Server error: ${error.message}` })}\n\n`);
+        res.end();
     }
 });
 
 
+// 获取最新对话
 app.get('/api/chat/latest', async (req, res) => {
     try {
         const files = await fs.readdir(HISTORIES_DIR);
         const jsonFiles = files
             .filter(file => file.endsWith('.json'))
-            .sort() // 按时间戳（文件名）升序排序
-            .reverse(); // 反转，最新的在最前面
+            .sort()
+            .reverse();
 
         if (jsonFiles.length === 0) {
-            // 如果没有任何历史记录，返回空状态
             return res.json({ chatId: null, messages: [] });
         }
 
         const latestFile = jsonFiles[0];
         const chatId = latestFile.replace('.json', '');
         const filePath = path.join(HISTORIES_DIR, latestFile);
-
         const data = await fs.readFile(filePath, 'utf-8');
         const messages = JSON.parse(data);
-
-        // 返回最新对话的ID和全部内容
         res.json({ chatId, messages });
 
     } catch (error) {
+        // 如果 histories 文件夹不存在，这是正常情况，返回空
+        if (error.code === 'ENOENT') {
+            return res.json({ chatId: null, messages: [] });
+        }
         console.error('Error fetching latest chat:', error);
         res.status(500).json({ error: 'Failed to retrieve the latest chat.' });
     }
 });
-
 
 // 获取历史列表
 app.get('/api/history', async (req, res) => {
     try {
         const files = await fs.readdir(HISTORIES_DIR);
         const jsonFiles = files.filter(file => file.endsWith('.json')).sort().reverse();
-
         const historyList = await Promise.all(
             jsonFiles.map(async (file) => {
                 const filePath = path.join(HISTORIES_DIR, file);
                 const data = await fs.readFile(filePath, 'utf-8');
                 const history = JSON.parse(data);
-                const firstUserPart = history[0]?.parts.find(part => part.text);
-                const title = firstUserPart?.text.substring(0, 50) || 'Untitled Chat';
+                // 找到第一个 'user' 角色的消息作为标题
+                const firstUserMessage = history.find(h => h.role === 'user');
+                const title = firstUserMessage?.parts[0]?.text.substring(0, 50) || 'Untitled Chat';
                 return {
                     chatId: file.replace('.json', ''),
                     title,
@@ -171,11 +167,13 @@ app.get('/api/history', async (req, res) => {
         );
         res.json(historyList);
     } catch (error) {
+        if (error.code === 'ENOENT') {
+            return res.json([]); // histories 目录不存在，返回空列表
+        }
         console.error('History list error:', error);
         res.status(500).json({ error: 'Failed to retrieve history.' });
     }
 });
-
 
 // 获取特定历史记录内容
 app.get('/api/history/:chatId', async (req, res) => {
@@ -202,6 +200,7 @@ app.delete('/api/history/:chatId', async (req, res) => {
 
 // --- 启动服务器 ---
 app.listen(port, host, () => {
+    // 启动时确保 histories 文件夹存在
     fs.mkdir(HISTORIES_DIR, { recursive: true });
-    console.log(`正在监听：http://${host}:${port}`);
+    console.log(`Server is running at http://${host}:${port}`);
 });

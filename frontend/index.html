@@ -75,17 +75,7 @@
         height: var(--hhh);
         position: relative;
     }
-
-    /* .sidebar {
-        width: 0;
-        color: #333;
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        border-right: 2px solid rgba(0, 0, 0, 0.08);
-        background-color: #f8fcff;
-    } */
-
+    .nav select,
     .nav button {
         background-color: rgba(52, 53, 65, 0.2);
         color: #eee;
@@ -95,15 +85,14 @@
         border: none;
         box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     }
-
+    .nav select option{
+        background-color: #fff;
+        color: #333;
+    }
     #history-list {
         width: 0;
         max-width: 300px;
         height: var(--hhh);
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        overflow-y: auto;
         transition: all 0.3s ease;
         position: absolute;
         z-index: 1000;
@@ -117,14 +106,14 @@
         position: absolute;
         right: 3px;
         top: 3px;
-        width: 220px;
+        width: 200px;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     .list-1 {
         max-height: var(--hhh);
         background-color: rgb(248, 253, 255);
-        border-radius: 8px;
+        border-radius: 5px;
         list-style: none;
         overflow-y: auto;
         z-index: 999;
@@ -155,7 +144,7 @@
         background-color: rgba(0, 0, 0, 0.1);
     }
 
-    @media (max-width: 1023px) {
+    @media (max-width: 1000px) {
         #list-123 {
             display: none;
         }
@@ -164,7 +153,6 @@
     .chat-area {
         background-color: rgba(255, 255, 255, 0.5);
         width: 100vw;
-        max-width: 800px;
         display: flex;
         flex-direction: column;
         position: absolute;
@@ -184,7 +172,7 @@
 
     .message {
         padding: 8px 20px;
-        padding-left: 48px;
+        padding-top: 48px;
         line-height: 1.2;
     }
 
@@ -228,6 +216,25 @@
 
     .gemini-message::before {
         background-image: url('gmm.png');
+    }
+
+    .user-message::after,
+    .gemini-message::after {
+
+        position: absolute;
+        left: 48px;
+        top: 18px;
+        font-size: 16px;
+        color: #666;
+        /* font-weight: 550; */
+    }
+
+    .user-message::after {
+        content: "曼波曼波";
+    }
+
+    .gemini-message::after {
+        content: "Gemini";
     }
 
     .gemini-message.loading::before {
@@ -305,13 +312,14 @@
 
     /* 行内代码样式 */
     .gemini-message code {
-        background-color: #f1f3f4;
+        background-color: rgba(0, 0, 0, 0.06);
         color: #6b0000;
         padding: 2px 6px;
         border-radius: 4px;
         /* font-family: 'Monaco', 'Consolas', 'Courier New', monospace; */
         font-size: 15px;
         border: 1px solid #e1e8ed;
+        font-weight: normal;
     }
 
     /* 引用块样式 */
@@ -574,7 +582,12 @@
 
 
     /* 滚动条 */
-    @media (min-width: 760px) {
+    @media (min-width: 1000px) {
+        .chat-area {
+            max-width: calc(100% - 416px);
+        }
+
+
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -594,6 +607,11 @@
 
 <body>
     <div class="nav">
+        <select id="gemini-v" class="">
+            <option value="gemini-2.5-flash">2.5-flash</option>
+            <option value="gemini-2.5-pro">2.5-pro</option>
+            <option value="gemini-2.0-flash">2.0-flash</option>
+        </select>
         <!-- <h1><span>G</span><span>e</span><span>m</span><span>i</span><span>n</span><span>i</span></h1> -->
         <button id="new-chat-btn">新建对话</button>
         <button id="history-b" onclick="openlist()">历史对话</button>
@@ -709,6 +727,7 @@
                     histories.forEach(h => {
                         const li = document.createElement('li');
                         li.textContent = h.title;
+                        li.title = h.title // 鼠标悬停时显示完整内容
                         li.dataset.chatId = h.chatId;
                         li.addEventListener('click', () => loadChatHistory(h.chatId));
                         historyList.appendChild(li);
@@ -734,8 +753,10 @@
 
             async function sendMessage() {
                 const prompt = promptInput.value.trim();
+                const modelSelect = document.getElementById('gemini-v'); // 1. 获取 select 元素
+                const selectedModel = modelSelect.value; // 2. 获取当前选中的 value
                 if (!prompt && !currentFile) return;
-                // 1. 发送时，直接禁用按钮
+                // 禁用按钮
                 sendBtn.disabled = true;
                 renderMessage('user', prompt || `已发送文件: ${currentFile.name}`);
                 generateUserMessageIndex();
@@ -743,6 +764,7 @@
                 filePreviewContainer.innerHTML = '';
                 const formData = new FormData();
                 formData.append('prompt', prompt);
+                formData.append('model', selectedModel); // 3. 将选中的模型名称添加到 formData 中
                 if (currentChatId) {
                     formData.append('chatId', currentChatId);
                 }
@@ -750,32 +772,24 @@
                     formData.append('file', currentFile);
                     currentFile = null;
                 }
-                // 2. 立即创建 AI 消息的占位符 DIV
                 const aiMessageDiv = document.createElement('div');
-                aiMessageDiv.classList.add('message', 'gemini-message');
-                // 3. 【核心改动】获取到这个元素后，立即给它添加 'loading' 类
-                aiMessageDiv.classList.add('loading');
-                // 现在，上面CSS中的 .gemini-message.loading::before 规则会生效，动画开始！
+                aiMessageDiv.classList.add('message', 'gemini-message', 'loading');
                 chatWindow.appendChild(aiMessageDiv);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
                 let accumulatedText = '';
                 try {
-                    // ... (fetch 和流式处理的代码保持不变)
                     const response = await fetch('/api/chat', { method: 'POST', body: formData });
                     if (!response.ok) {
                         const errData = await response.json();
                         throw new Error(errData.error || 'Network response was not ok');
                     }
-
                     const reader = response.body.getReader();
                     const decoder = new TextDecoder();
                     let buffer = '';
-
                     while (true) {
                         const { value, done } = await reader.read();
                         if (done) break;
                         buffer += decoder.decode(value, { stream: true });
-
                         const parts = buffer.split('\n\n');
                         buffer = parts.pop();
                         for (const part of parts) {
@@ -784,12 +798,10 @@
                                 try {
                                     const data = JSON.parse(dataString);
                                     if (data.error) throw new Error(data.error);
-
                                     if (!currentChatId && data.chatId) {
                                         currentChatId = data.chatId;
                                         fetchAndRenderHistory();
                                     }
-
                                     accumulatedText += data.reply;
                                     aiMessageDiv.innerHTML = marked.parse(accumulatedText);
                                     chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -804,15 +816,12 @@
                     console.error('Error sending message:', error);
                     aiMessageDiv.innerHTML = marked.parse(`抱歉，出错了: ${error.message}`);
                 } finally {
-                    // 4. 【核心改动】无论成功或失败，最后都从这个元素上移除 'loading' 类
                     aiMessageDiv.classList.remove('loading');
-                    // 动画立即停止！
-                    // 5. 最后，重新启用按钮
                     sendBtn.disabled = false;
-
                     chatWindow.scrollTop = chatWindow.scrollHeight;
                 }
             }
+
 
             // --- 事件监听 ---
             sendBtn.addEventListener('click', sendMessage);
@@ -858,7 +867,7 @@
         });
 
         function openlist() {
-            document.getElementById('history-list').style.width = '100%';
+            document.getElementById('history-list').style.width = '300px';
         }
         function closelist() {
             document.getElementById('history-list').style.width = '0';
@@ -890,7 +899,7 @@
                 // b. 获取消息文本内容，并做一个简单的截断，防止列表项太长
                 let messageText = messageDiv.querySelector('p')?.textContent || messageDiv.textContent;
                 messageText = messageText.trim();
-                if (!messageText) return; 
+                if (!messageText) return;
                 const displayText = messageText.length > 25
                     ? messageText.substring(0, 22) + '...'
                     : messageText;
@@ -908,7 +917,7 @@
                         // 使用 scrollIntoView 平滑滚动到目标位置
                         targetMessage.scrollIntoView({
                             behavior: 'smooth',
-                            block: 'center' 
+                            block: 'center'
                         });
                     }
                 });
