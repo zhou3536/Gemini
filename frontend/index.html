@@ -142,30 +142,51 @@
     }
 
     .message {
-        margin-bottom: 1px;
         padding: 8px 20px;
+        padding-left: 48px;
         line-height: 1.2;
     }
 
     .message p {
+        margin: 5px 0;
         word-break: break-all;
+        line-height: 1.6;
     }
 
     .user-message {
         background-color: #f8feff;
+        position: relative;
     }
 
-    .user-message p {
-        margin: 5px 0;
-    }
-
-    .user-message:first-child {
-        padding-top: 15px;
-    }
 
     .gemini-message {
         background-color: transparent;
-        /* align-self: flex-start; */
+        position: relative;
+    }
+
+    .user-message::before,
+    .gemini-message::before {
+        content: "";
+        display: block;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        /* background-color: green; */
+        position: absolute;
+        left: 5px;
+        top: 8px;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .user-message::before {
+        background-image: url('mb.png');
+    }
+
+    .gemini-message::before {
+        background-image: url('gmm.png');
     }
 
     /* AI回复内容的Markdown样式优化 */
@@ -482,6 +503,22 @@
             background-position: -100% 0;
         }
     }
+
+    /* 滚动条 */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.5);
+    }
 </style>
 
 <body>
@@ -493,11 +530,7 @@
     <div class="container" onclick="closelist()">
         <ul id="history-list" class="sidebar"></ul>
         <main class="chat-area">
-            <div id="chat-window">
-                <div class="message welcome-message">
-                    <p>你好！有什么可以帮你的吗？</p>
-                </div>
-            </div>
+            <div id="chat-window"></div>
             <div id="loading-indicator" class="hidden"></div>
             <div class="input-area">
                 <textarea id="prompt-input" placeholder="输入消息..." rows="3"></textarea>
