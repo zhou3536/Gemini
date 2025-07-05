@@ -51,50 +51,74 @@ app.post('/api/chat', upload.single('file'), async (req, res) => {
     try {
         const { prompt, chatId: existingChatId } = req.body;
         const file = req.file;
-
+        // 1. 设置SSE响应头
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.flushHeaders(); 
         let history = [];
         let chatId = existingChatId;
-
+        // 2. 提前处理 chatId 和 history
         if (chatId) {
-            // 继续现有对话
             const historyPath = path.join(HISTORIES_DIR, `${chatId}.json`);
             try {
                 const historyData = await fs.readFile(historyPath);
                 history = JSON.parse(historyData);
             } catch (error) {
-                // 如果找不到历史文件，就当作新对话处理
                 console.log(`History file for ${chatId} not found. Starting new chat.`);
-                chatId = null;
+                chatId = Date.now().toString();
             }
-        }
-
-        // 如果没有 chatId (无论是本来就没有还是历史文件找不到)，开启新对话
-        if (!chatId) {
+        } else {
             chatId = Date.now().toString();
         }
-
         const userParts = [{ text: prompt }];
         if (file) {
             userParts.unshift(fileToGenerativePart(file.buffer, file.mimetype));
         }
-
         const chat = model.startChat({ history });
-        const result = await chat.sendMessage(userParts);
-        const response = result.response;
-        const text = response.text();
-
-        // 从 chat 会话中获取由 SDK 管理的完整、最新的历史记录
-        const updatedHistory = await chat.getHistory();
-        // 使用权威的最新历史记录进行保存
+        const result = await chat.sendMessageStream(userParts);
+        // --- 关键改动在这里 ---
+        // 3. 创建一个变量来手动聚合所有AI响应的文本块
+        let fullResponseText = '';
+        // 4. 迭代流，既发送数据块给前端，也聚合文本到我们自己的变量中
+        for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            fullResponseText += chunkText; // <-- 手动聚合
+            const payload = {
+                reply: chunkText,
+                chatId: chatId
+            };
+            res.write(`data: ${JSON.stringify(payload)}\n\n`);
+        }
+        // 5. 流结束后，手动构建要保存的完整历史记录
+        //    a. 添加用户的提问到历史中
+        history.push({
+            role: 'user',
+            parts: userParts
+        });
+        //    b. 添加AI完整的、聚合后的回答到历史中
+        history.push({
+            role: 'model',
+            parts: [{ text: fullResponseText }] // <-- 使用我们自己聚合的完整文本
+        });
+        // 6. 将构建好的、格式正确的完整历史记录写入文件
         const historyPath = path.join(HISTORIES_DIR, `${chatId}.json`);
-        await fs.writeFile(historyPath, JSON.stringify(updatedHistory, null, 2));
-
-        res.json({ reply: text, chatId });
+        // `history` 现在是一个包含所有对话轮次的、格式正确的数组
+        await fs.writeFile(historyPath, JSON.stringify(history, null, 2));
+        // 7. 结束响应流
+        res.end();
     } catch (error) {
         console.error('Chat API error:', error);
-        res.status(500).json({ error: 'Failed to get response from Gemini.' });
+        const errorPayload = { error: 'Failed to get response from Gemini.' };
+        if (!res.headersSent) {
+            res.status(500).json(errorPayload);
+        } else {
+            res.write(`data: ${JSON.stringify(errorPayload)}\n\n`);
+            res.end();
+        }
     }
 });
+
 
 app.get('/api/chat/latest', async (req, res) => {
     try {
