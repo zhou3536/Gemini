@@ -75,6 +75,7 @@
         height: var(--hhh);
         position: relative;
     }
+
     .nav select,
     .nav button {
         background-color: rgba(52, 53, 65, 0.2);
@@ -85,10 +86,12 @@
         border: none;
         box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     }
-    .nav select option{
+
+    .nav select option {
         background-color: #fff;
         color: #333;
     }
+
     #history-list {
         width: 0;
         max-width: 300px;
@@ -225,7 +228,7 @@
         left: 48px;
         top: 18px;
         font-size: 16px;
-        color: #666;
+        color: #1a191b;
         /* font-weight: 550; */
     }
 
@@ -285,7 +288,7 @@
         /* margin: 12px 0; */
         line-height: 1.6;
         word-break: break-word;
-        color: #2c3e50;
+        /* color: #2c3e50; */
     }
 
     /* 代码块样式 */
@@ -400,17 +403,13 @@
 
     /* 分割线样式 */
     .gemini-message hr {
-        border-top: 1px solid #000;
-        /* border: none; */
-        /* height: 2px; */
-        /* background: linear-gradient(to right, #3498db, #2ecc71); */
+        border-top: 1px solid #555;
         margin: 24px 0;
-        /* border-radius: 1px; */
     }
 
     /* 强调文本样式 */
     .gemini-message strong {
-        color: #34495e;
+        /* color: #34495e; */
         font-weight: 550;
     }
 
@@ -701,7 +700,7 @@
             function renderChatHistory(messages) {
                 chatWindow.innerHTML = '';
                 if (!messages || messages.length === 0) {
-                    renderMessage('gemini', '你好！我是Gemini。'); // 更改了欢迎语末尾的字符，防止误解
+                    renderMessage('gemini', 'Hello! How can I do for you?'); // 更改了欢迎语末尾的字符，防止误解
                     return;
                 }
                 messages.forEach(msg => {
@@ -923,6 +922,15 @@
                 });
                 indexList.appendChild(listItem);
             });
+        }
+        //缓存选择
+        const modelSelect = document.getElementById('gemini-v');
+        modelSelect.addEventListener('change', function () {
+            localStorage.setItem('selectedModel', this.value);
+        });
+        const savedValue = localStorage.getItem('selectedModel');
+        if (savedValue) {
+            modelSelect.value = savedValue;
         }
     </script>
 </body>
