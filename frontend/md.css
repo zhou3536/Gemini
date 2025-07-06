@@ -112,15 +112,15 @@
     background-color: #fff;
     border-radius: 8px;
     overflow: hidden;
-    overflow-x: auto;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .gemini-message th,
 .gemini-message td {
     border: 1px solid #e1e8ed;
-    padding: 12px;
+    padding: 4px;
     text-align: left;
+    min-width: 180px;
 }
 
 .gemini-message th {

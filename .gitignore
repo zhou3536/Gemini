@@ -1,0 +1,9 @@
+# Dependencies
+node_modules/
+package-lock.json
+backend/node_modules/
+backend/histories/
+# npm debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
