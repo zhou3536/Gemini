@@ -85,6 +85,7 @@ body {
     transition: all 0.3s ease;
     position: absolute;
     z-index: 1000;
+    right: 0;
 }
 
 #history-list li:hover {
@@ -113,7 +114,7 @@ body {
 .list-1:empty {
     display: none;
 }
-
+.list-1 h4,
 .list-1 li {
     padding: 3px 10px;
     font-size: 14px;
@@ -180,6 +181,8 @@ body {
 .gemini-message {
     background-color: transparent;
     position: relative;
+    min-height: 150px;
+    overflow-x: auto
 }
 
 .user-message::before,
@@ -240,212 +243,6 @@ body {
     }
 }
 
-/* AI回复内容的Markdown样式优化 */
-.gemini-message h1,
-.gemini-message h2,
-.gemini-message h3,
-.gemini-message h4,
-.gemini-message h5,
-.gemini-message h6 {
-    color: #2c3e50;
-    font-weight: 600;
-    margin: 16px 0 8px 0;
-    line-height: 1.4;
-}
-
-.gemini-message h1 {
-    font-size: 1.6em;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 8px;
-}
-
-.gemini-message h2 {
-    font-size: 1.4em;
-    border-bottom: 1px solid #bdc3c7;
-    padding-bottom: 6px;
-}
-
-.gemini-message h3 {
-    font-size: 1.2em;
-    color: #34495e;
-}
-
-.gemini-message p {
-    /* margin: 12px 0; */
-    line-height: 1.6;
-    word-break: break-word;
-    /* color: #2c3e50; */
-}
-
-/* 代码块样式 */
-.gemini-message pre {
-    background-color: #f8f9fa;
-    border: 1px solid #e1e8ed;
-    border-radius: 8px;
-    padding: 16px;
-    margin: 16px 0;
-    overflow-x: auto;
-    font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
-    font-size: 14px;
-    line-height: 1.4;
-    position: relative;
-}
-
-.gemini-message pre code {
-    background: none;
-    border: none;
-    padding: 0;
-    font-size: inherit;
-    color: inherit;
-}
-
-/* 行内代码样式 */
-.gemini-message code {
-    background-color: rgba(0, 0, 0, 0.06);
-    color: #6b0000;
-    padding: 2px 6px;
-    border-radius: 4px;
-    /* font-family: 'Monaco', 'Consolas', 'Courier New', monospace; */
-    font-size: 15px;
-    border: 1px solid #e1e8ed;
-    font-weight: normal;
-}
-
-/* 引用块样式 */
-.gemini-message blockquote {
-    border-left: 4px solid #3498db;
-    background-color: #f8f9fa;
-    margin: 16px 0;
-    padding: 12px 16px;
-    border-radius: 0 8px 8px 0;
-    color: #555;
-    font-style: italic;
-}
-
-.gemini-message blockquote p {
-    margin: 0;
-}
-
-/* 列表样式 */
-.gemini-message ul,
-.gemini-message ol {
-    margin: 12px 0;
-    padding-left: 24px;
-}
-
-.gemini-message li {
-    margin: 6px 0;
-    line-height: 1.6;
-}
-
-.gemini-message ul li {
-    list-style-type: disc;
-}
-
-.gemini-message ol li {
-    list-style-type: decimal;
-}
-
-/* 表格样式 */
-.gemini-message table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 16px 0;
-    background-color: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.gemini-message th,
-.gemini-message td {
-    border: 1px solid #e1e8ed;
-    padding: 12px;
-    text-align: left;
-}
-
-.gemini-message th {
-    background-color: #f8f9fa;
-    font-weight: 600;
-    color: #2c3e50;
-}
-
-.gemini-message tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
-
-/* 链接样式 */
-.gemini-message a {
-    color: #3498db;
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: all 0.3s ease;
-}
-
-.gemini-message a:hover {
-    color: #2980b9;
-    border-bottom-color: #2980b9;
-}
-
-/* 分割线样式 */
-.gemini-message hr {
-    border-top: 1px solid #555;
-    margin: 24px 0;
-}
-
-/* 强调文本样式 */
-.gemini-message strong {
-    color: #222;
-    font-weight: 550;
-}
-
-.gemini-message em {
-    color: #7f8c8d;
-    font-style: italic;
-}
-
-/* 图片样式 */
-.gemini-message img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin: 16px 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* 数学公式样式（如果使用） */
-.gemini-message .math {
-    background-color: #f8f9fa;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-family: 'Times New Roman', serif;
-}
-
-/* 高亮代码的特殊样式调整 */
-.gemini-message .hljs {
-    background: #f8f9fa !important;
-    color: #2c3e50 !important;
-}
-
-.gemini-message .hljs-comment {
-    color: #8e908c !important;
-}
-
-.gemini-message .hljs-keyword {
-    color: #8959a8 !important;
-}
-
-.gemini-message .hljs-string {
-    color: #718c00 !important;
-}
-
-.gemini-message .hljs-number {
-    color: #f5871f !important;
-}
-
-.gemini-message .hljs-function {
-    color: #4271ae !important;
-}
 
 .input-area {
     background-color: #fff;
@@ -569,7 +366,8 @@ body {
 /* 滚动条 */
 @media (min-width: 1000px) {
     .chat-area {
-        max-width: calc(100% - 416px);
+        max-width: 800px;
+        max-width: min(calc(100% - 416px), 800px);
     }
 
 
