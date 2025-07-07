@@ -1,11 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>雪花飘飘</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* 防止滚动条 */
+            background-color: #111; /* 深色背景，更容易看清雪花 */
+        }
+
+        canvas {
+            display: block; /* 确保 canvas 占据整个屏幕 */
+        }
+    </style>
 </head>
 <body>
-    <h1>hello</h1>
+    <canvas id="snowCanvas"></canvas>
+
+    <script>
+        window.onload = function() {
+            const canvas = document.getElementById("snowCanvas");
+            const ctx = canvas.getContext("2d");
+
+            // 设置 canvas 尺寸
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            // 雪花数量
+            const snowFlakeCount = 200;
+            const snowFlakes = [];
+
+            // 雪花对象
+            function SnowFlake() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.radius = Math.random() * 3 + 1; // 雪花大小
+                this.speedY = Math.random() * 2 + 0.5; // 下落速度
+                this.speedX = Math.random() - 0.5; // 左右摆动
+                this.opacity = Math.random() * 0.7 + 0.3; // 透明度
+            }
+
+            // 初始化雪花
+            for (let i = 0; i < snowFlakeCount; i++) {
+                snowFlakes.push(new SnowFlake());
+            }
+
+            // 绘制雪花
+            function drawSnowFlake(flake) {
+                ctx.beginPath();
+                ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 255, 255, " + flake.opacity + ")"; // 白色雪花，带透明度
+                ctx.fill();
+            }
+
+            // 更新雪花位置
+            function updateSnowFlake(flake) {
+                flake.y += flake.speedY;
+                flake.x += flake.speedX;
+
+                // 如果雪花落出屏幕，则重置位置
+                if (flake.y > canvas.height) {
+                    flake.y = -flake.radius; // 放到屏幕上方
+                    flake.x = Math.random() * canvas.width;
+                }
+
+                // 如果雪花超出屏幕左右边界，则反向移动
+                if (flake.x < 0 || flake.x > canvas.width) {
+                    flake.speedX = -flake.speedX;
+                }
+            }
+
+            // 动画循环
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // 清空画布
+
+                for (let i = 0; i < snowFlakeCount; i++) {
+                    const flake = snowFlakes[i];
+                    drawSnowFlake(flake);
+                    updateSnowFlake(flake);
+                }
+
+                requestAnimationFrame(animate); // 请求下一帧动画
+            }
+
+            // 启动动画
+            animate();
+
+            // 监听窗口大小改变，重新调整 canvas 尺寸
+            window.addEventListener("resize", function() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        };
+    </script>
 </body>
 </html>

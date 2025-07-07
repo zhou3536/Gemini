@@ -109,18 +109,11 @@ app.post('/api/chat', upload.single('file'), async (req, res) => {
             role: 'model',
             parts: [{ text: fullResponseText }] // 4. 将累积的完整回复作为一个 part 保存
         };
-
-        // 将旧历史、用户新消息、模型新回复合并成最终要保存的完整历史
         const updatedHistory = [...history, userMessage, modelResponse];
-        
         const newFilePath = path.join(HISTORIES_DIR, `${newChatId}.json`);
         // 5. 保存这个我们手动构建的、干净的、完整的历史记录
         await fs.writeFile(newFilePath, JSON.stringify(updatedHistory, null, 2));
-        
-        // ======================= 核心改动部分 (结束) =======================
-
         res.end();
-
     } catch (error) {
         console.error('Chat API Error:', error);
         res.status(500).write(`data: ${JSON.stringify({ error: `Server error: ${error.message}` })}\n\n`);
@@ -200,17 +193,25 @@ app.get('/api/history/:chatId', async (req, res) => {
 });
 
 // 删除历史记录
-app.delete('/api/history/:chatId', async (req, res) => {
+// app.delete('/api/history/:chatId', async (req, res) => {
+//     try {
+//         const filePath = path.join(HISTORIES_DIR, `${req.params.chatId}.json`);
+//         await fs.unlink(filePath);
+//         res.json({ success: true });
+//     } catch (error) {
+//         console.error('Delete history error:', error);
+//         res.status(500).json({ error: 'Failed to delete history.' });
+//     }
+// });
+app.get('/api/history/:chatId', async (req, res) => {
     try {
         const filePath = path.join(HISTORIES_DIR, `${req.params.chatId}.json`);
-        await fs.unlink(filePath);
-        res.json({ success: true });
+        const data = await fs.readFile(filePath, 'utf-8');
+        res.json(JSON.parse(data));
     } catch (error) {
-        console.error('Delete history error:', error);
-        res.status(500).json({ error: 'Failed to delete history.' });
+        res.status(404).json({ error: 'History not found.' });
     }
 });
-
 
 // --- 启动服务器 ---
 app.listen(port, host, () => {

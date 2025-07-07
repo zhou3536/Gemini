@@ -222,7 +222,7 @@ body {
 }
 
 .user-message::after {
-    content: "曼波曼波";
+    content: "曼波~";
 }
 
 .gemini-message::after {
@@ -230,7 +230,7 @@ body {
 }
 
 .gemini-message.loading {
-    min-height: 150px;
+    min-height: 90px;
 }
 
 .gemini-message.loading::before {
@@ -251,20 +251,16 @@ body {
 .input-area {
     background-color: #fff;
     border-radius: 12px;
-    display: flex;
     width: calc(100% - 14px);
     max-width: 600px;
     margin: 0 auto;
     margin-top: 6px;
     padding: 6px;
-    border: 1px solid #1eacff;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
+    border: 2px solid rgba(30, 173, 255, 0.6);
 }
 
 #prompt-input {
-    /* background-color: #ffffff9d; */
+    width: 100%;
     flex-grow: 1;
     padding: 10px;
     outline: none;
@@ -276,16 +272,37 @@ body {
     min-height: 24px;
     overflow-y: auto;
     resize: none;
+    /* background-color: #922b2b; */
 }
 
 .input-area:focus-within {
-    box-shadow: 0 0 0 1px #1eacff;
+    border: 2px solid #1eacff;
 }
 
 .send-box {
     position: relative;
+    display: flex;
 }
 
+#gemini-v {
+    width: 75px;
+    height: 25px;
+    padding: 0 6px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    border: 1px solid rgba(30, 173, 255, 0.3);
+    display: block;
+}
+
+#gemini-v option{
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #fff;
+}
 .send-btn {
     background-image: url('send.png');
     background-size: cover;
@@ -328,41 +345,6 @@ body {
     cursor: pointer;
     display: grid;
     place-content: center;
-}
-
-.hidden {
-    display: none;
-}
-
-.ai-8 {
-    width: 35px;
-    height: 35px;
-    position: relative;
-    border-radius: 50%;
-    border: 3px solid #1eacff;
-    background-color: #fff;
-}
-
-.ai-8::before {
-    content: '';
-    position: absolute;
-    width: 17px;
-    height: 3px;
-    background-color: #1eacff;
-    top: 50%;
-    left: 50%;
-    transform-origin: left center;
-    animation: radar 0.8s infinite linear;
-}
-
-@keyframes radar {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
 }
 
 
