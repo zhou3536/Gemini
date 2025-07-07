@@ -5,8 +5,9 @@
 }
 
 :root {
-    --hhh: calc(100vh - 60px);
-    --hhh: calc(100dvh - 60px);
+    --navh: 35px;
+    --hhh: calc(100vh - var(--navh));
+    --hhh: calc(100dvh - var(--navh));
 }
 
 body {
@@ -24,21 +25,19 @@ body {
 
 
 .nav {
-    height: 60px;
+    height: var(--navh);
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     padding: 0 15px;
     gap: 10px;
-    background-color: rgb(73, 158, 255);
+    background: linear-gradient(to bottom, #b2dcff 0%, #defeff 100%);
+    font-size: 24px;
+    color: #253748;
+    font-weight: 700;
 }
 
-.nav img {
-    display: block;
-    margin-right: auto;
-    width: 80px;
-    border-radius: 8px;
-}
+
 
 .container {
     /* display: flex; */
@@ -68,15 +67,7 @@ body {
     color: #333;
 }
 
-@media (max-width: 500px) {
-    .nav button {
-        width: 50px;
-        line-height: 17px;
-        padding: 5px 8px;
-        text-align: center;
 
-    }
-}
 
 #history-list {
     width: 0;
@@ -247,6 +238,13 @@ body {
     }
 }
 
+.menu {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    gap: 10px;
+    width: 100%;
+}
 
 .input-area {
     background-color: #fff;
@@ -284,44 +282,48 @@ body {
     display: flex;
 }
 
-#gemini-v {
-    width: 75px;
+.menu button,
+.menu select {
     height: 25px;
     padding: 0 6px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
     background-color: transparent;
     border-radius: 5px;
     outline: none;
-    border: none;
     border: 1px solid rgba(30, 173, 255, 0.3);
     display: block;
 }
 
-#gemini-v option{
-    background-color: rgba(0, 0, 0, 0.4);
+#gemini-v {
+    margin-left: auto;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.menu option {
+    background-color: rgba(0, 7, 85, 0.6);
     color: #fff;
 }
-.send-btn {
+
+#send-btn {
     background-image: url('send.png');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
     background-color: transparent;
     border: none;
-    /* border-radius: 50%; */
     cursor: pointer;
     width: 30px;
     height: 30px;
 }
 
-.send-btn img {
+/* .send-btn img {
     display: block;
     width: 30px;
-}
+} */
 
 #file-preview-container {
+    display: none;
     position: absolute;
     font-size: 12px;
     line-height: 14px;
@@ -337,6 +339,7 @@ body {
 }
 
 .file-label {
+    display: none;
     background-color: #4CAF50;
     color: white;
     border: none;
@@ -347,7 +350,11 @@ body {
     place-content: center;
 }
 
-
+@media (max-width: 500px) {
+    #prompt-input {
+        padding: 5px;
+    }
+}
 
 /* 滚动条 */
 @media (min-width: 1000px) {
