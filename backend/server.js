@@ -46,14 +46,26 @@ function fileToGenerativePart(buffer, mimeType) {
 // --- API 路由 ---
 
 // 核心聊天接口
+// 核心聊天接口
 app.post('/api/chat', upload.single('file'), async (req, res) => {
     try {
-        const { prompt, chatId } = req.body;
-        const modelName = req.body.model; 
+        const { prompt, chatId, searchEnabled } = req.body;
+        const modelName = req.body.model;
 
-        console.log(`Using model: ${modelName} for chat: ${chatId || 'New Chat'}`);
+        // 将字符串转换为布尔值
+        const isSearchEnabled = searchEnabled === 'true' || searchEnabled === true;
 
-        const model = genAI.getGenerativeModel({ model: modelName });
+        console.log(`Using model: ${modelName} for chat: ${chatId || 'New Chat'}, Search: ${isSearchEnabled}`);
+
+        // 根据搜索状态配置模型
+        const modelConfig = { model: modelName };
+
+        // 如果启用搜索，添加搜索工具
+        if (isSearchEnabled) {
+            modelConfig.tools = [{ google_search: {} }];
+        }
+
+        const model = genAI.getGenerativeModel(modelConfig);
 
         let history = [];
         if (chatId) {
@@ -61,11 +73,11 @@ app.post('/api/chat', upload.single('file'), async (req, res) => {
                 const historyPath = path.join(HISTORIES_DIR, `${chatId}.json`);
                 const data = await fs.readFile(historyPath, 'utf-8');
                 history = JSON.parse(data);
-             } catch (e) {
+            } catch (e) {
                 console.log(`History for ${chatId} not found. Starting a new chat.`);
-             }
+            }
         }
-        
+
         const chat = model.startChat({ history });
 
         const messageParts = [];
@@ -76,7 +88,7 @@ app.post('/api/chat', upload.single('file'), async (req, res) => {
             const filePart = fileToGenerativePart(req.file.buffer, req.file.mimetype);
             messageParts.push(filePart);
         }
-        
+
         const result = await chat.sendMessageStream(messageParts);
 
         res.setHeader('Content-Type', 'text/event-stream');
@@ -84,34 +96,30 @@ app.post('/api/chat', upload.single('file'), async (req, res) => {
         res.setHeader('Connection', 'keep-alive');
 
         const newChatId = chatId || `${Date.now()}`;
-        
-        // ======================= 核心改动部分 (开始) =======================
-        
-        let fullResponseText = ''; // 1. 创建一个变量来累积模型的完整回复
+
+        let fullResponseText = '';
 
         for await (const chunk of result.stream) {
             const chunkText = chunk.text();
-            fullResponseText += chunkText; // 2. 在流式传输过程中，将每个文本块累加起来
+            fullResponseText += chunkText;
 
             const responseData = {
-                reply: chunkText, // 仍然是分块发送给前端，保证打字机效果
-                chatId: newChatId, 
+                reply: chunkText,
+                chatId: newChatId,
             };
             res.write(`data: ${JSON.stringify(responseData)}\n\n`);
         }
-        
-        // 3. 对话结束后，不再使用 chat.getHistory()，而是手动构建历史记录
-        const userMessage = { 
-            role: 'user', 
-            parts: messageParts // messageParts 已经包含了文本和文件
+
+        const userMessage = {
+            role: 'user',
+            parts: messageParts
         };
         const modelResponse = {
             role: 'model',
-            parts: [{ text: fullResponseText }] // 4. 将累积的完整回复作为一个 part 保存
+            parts: [{ text: fullResponseText }]
         };
         const updatedHistory = [...history, userMessage, modelResponse];
         const newFilePath = path.join(HISTORIES_DIR, `${newChatId}.json`);
-        // 5. 保存这个我们手动构建的、干净的、完整的历史记录
         await fs.writeFile(newFilePath, JSON.stringify(updatedHistory, null, 2));
         res.end();
     } catch (error) {
