@@ -467,6 +467,7 @@
                         body: JSON.stringify({ indices: indices })
                     });
                     fetchAndRenderHistory();
+                    newChatBtn.click();
                 } catch (error) {
                     console.error("删除请求失败:", error);
                 }
@@ -506,7 +507,7 @@
                 listItem.addEventListener('click', (event) => {
                     const targetMessage = document.getElementById(messageId);
                     if (targetMessage) {
-                        targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 });
                 indexList.appendChild(listItem);
