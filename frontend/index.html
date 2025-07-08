@@ -129,7 +129,7 @@
                 }
             }
 
-            // 加载指定的聊天记录 (修改点 1: 加载时缓存ID)
+            // 加载指定的聊天记录
             async function loadChatHistory(chatId) {
                 if (!chatId) return;
                 try {
@@ -151,7 +151,7 @@
                     newChatBtn.click(); // 模拟点击新建对话按钮，重置界面
                 }
             }
-
+            //发送信息
             async function sendMessage() {
                 const prompt = promptInput.value.trim();
                 const modelSelect = document.getElementById('gemini-v');
@@ -160,7 +160,6 @@
 
                 sendBtn.disabled = true;
                 renderMessage('user', prompt || `已发送文件: ${currentFile.name}`);
-                generateUserMessageIndex();
                 promptInput.value = '';
                 filePreviewContainer.innerHTML = '';
                 chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -183,8 +182,8 @@
                 think.innerText = '正在思考...';
                 const search = document.createElement('i');
                 search.innerText = '正在搜索互联网...';
-                if(SearchOn){aiMessageDiv.appendChild(search)}
-                else{aiMessageDiv.appendChild(think)};
+                if (SearchOn) { aiMessageDiv.appendChild(search) }
+                else { aiMessageDiv.appendChild(think) };
 
                 chatWindow.scrollTop = chatWindow.scrollHeight;
                 let accumulatedText = '';
@@ -219,7 +218,6 @@
                                     if (!currentChatId && data.chatId) {
                                         currentChatId = data.chatId;
                                         localStorage.setItem('currentActiveChatId', currentChatId);
-                                        fetchAndRenderHistory();
                                     }
                                     accumulatedText += data.reply;
                                     aiMessageDiv.innerHTML = marked.parse(accumulatedText);
@@ -237,14 +235,15 @@
                         }
                     }
                     hljs.highlightAll();
+                    fetchAndRenderHistory();
+
                 } catch (error) {
                     console.error('Error sending message:', error);
                     aiMessageDiv.innerHTML = marked.parse(`抱歉，出错了: ${error.message}`);
                 } finally {
                     aiMessageDiv.classList.remove('loading');
                     sendBtn.disabled = false;
-
-                    // [修改点 3] 在所有操作结束后，最后再执行一次智能滚动判断
+                    generateUserMessageIndex();
                     const threshold = 10;
                     const isAtBottom = chatWindow.scrollHeight - chatWindow.scrollTop - chatWindow.clientHeight <= threshold;
                     if (isAtBottom) {
@@ -305,7 +304,6 @@
             initializeApp();
         });
 
-        // --- 以下是与核心逻辑无关的辅助函数，保持不变 ---
 
         function openlist() {
             document.getElementById('history-list').style.width = '300px';
@@ -378,7 +376,7 @@
         // window.onload = adjustRows;
         // window.onresize = adjustRows;
     </script>
-       <script>
+    <script>
         let SearchOn = false
         function Sch() {
             const aaa = document.getElementById('Search');

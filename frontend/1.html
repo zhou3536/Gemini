@@ -23,6 +23,30 @@
                 a = true
             }
         }
+
+        //  function bb(){
+        //     console.log(d);
+        // };
+        // // console.log(b);
+        // let b = 10;
+        // let d = 20;
+        function bb() {
+            console.log(d);
+        };
+
+        // console.log(b); // 注释掉这行
+
+        try {
+            console.log(b); // 尝试访问 TDZ 变量
+        } catch (e) {
+            console.error("捕获到的错误:", e); // 捕获 TDZ 错误
+        }
+
+        let b = 10;
+        let d = 20;
+
+        bb(); // 此时 bb() 可以正常运行 (除非你试图在 try/catch 块中调用它)
+
     </script>
 </body>
 

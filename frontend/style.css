@@ -215,10 +215,14 @@ body {
 
     position: absolute;
     left: 48px;
-    top: 18px;
+    top: 16px;
+    padding: 1px 7px;
+    border-radius: 20px;
     font-size: 16px;
     color: #1a191b;
-    /* font-weight: 550; */
+    font-weight: 550;
+    background-color: rgba(113, 198, 255, 0.1);
+    border: 1px solid rgba(113, 198, 255, 0.3);
 }
 
 .user-message::after {
