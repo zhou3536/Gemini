@@ -209,8 +209,6 @@
                                     const data = JSON.parse(dataString);
                                     if (data.error) throw new Error(data.error);
 
-                                    // --- [关键修改：智能滚动逻辑] ---
-                                    // 1. 在添加新内容之前，检查滚动条是否接近底部
                                     const threshold = 10;
                                     const isAtBottom = chatWindow.scrollHeight - chatWindow.scrollTop - chatWindow.clientHeight <= threshold;
 
@@ -222,8 +220,13 @@
                                     accumulatedText += data.reply;
                                     aiMessageDiv.innerHTML = marked.parse(accumulatedText);
 
-                                    // 2. 如果之前就在底部，那么在添加新内容后，自动滚动到底部
-                                    if (isAtBottom) {
+                                    // 2. 检查gemini-message是否已经滚动到容器顶部
+                                    const messageRect = aiMessageDiv.getBoundingClientRect();
+                                    const containerRect = chatWindow.getBoundingClientRect();
+                                    const messageAtTop = messageRect.top <= containerRect.top + 150;
+
+                                    // 3. 只有在之前就在底部且消息还未到达顶部时，才自动滚动到底部
+                                    if (isAtBottom && !messageAtTop) {
                                         chatWindow.scrollTop = chatWindow.scrollHeight;
                                     }
                                     // ------------------------------------
@@ -251,8 +254,6 @@
                     }
                 }
             }
-
-
 
             // --- 事件监听 ---
             sendBtn.addEventListener('click', sendMessage);
