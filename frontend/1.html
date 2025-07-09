@@ -1,42 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<style>
-    * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-    div{
-        border: 1px solid #000;
-    }
-    .a{
-        width: 200px;
-        height: 200px;
-        margin: 20px;
-        padding: 10px;
-    }
-    .b{
-        width: 100px;
-        height: 100px;
-        margin: 10px;
-    }
-    .c{
-        width: 200px;
-        height: 200px;
-        margin: 5px;
-        outline: 1px solid #000;
-    }
-</style>
-<body>
-    
-    <div class="a">
-        <div class="b"></div>
+<div class="input-area">
+    <textarea id="prompt-input" placeholder="输入消息..." rows="2" onclick="closelist()"></textarea>
+    <div class="send-box">
+        <div class="menu">
+            <button id="Search" class="search" onclick="Sch()">联网搜索</button>
+            <button id="send-btn" class="send-btn"></button>
+        </div>
     </div>
-    <div class="c"></div>
-</body>
-</html>
+</div>

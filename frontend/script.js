@@ -90,13 +90,9 @@ let SearchOn = false
 function Sch() {
     const aaa = document.getElementById('Search');
     if (SearchOn) {
-        // aaa.style.outline = 'none'
-        // aaa.style.color = '#aaa'
         aaa.classList.remove('SearchON')
         SearchOn = false
     } else if (!SearchOn) {
-        // aaa.style.outline = '1px solid #0073ed';
-        // aaa.style.color = '#0073ed'
         aaa.classList.add('SearchON')
         SearchOn = true
     }
@@ -115,3 +111,29 @@ function opendhdh() {
         dhdh = true;
     }
 }
+
+//手机端键盘弹窗优化
+// document.addEventListener('DOMContentLoaded', (event) => {
+//     const promptInput = document.getElementById('prompt-input');
+//     const searchButton = document.getElementById('Search');
+//     promptInput.addEventListener('click', closelist);
+//     searchButton.addEventListener('touchstart', (e) => {
+//         e.preventDefault();
+//         Sch();
+//         setTimeout(() => { promptInput.focus(); }, 50);
+//     });
+//     searchButton.addEventListener('click', (e) => {Sch()});
+// });
+// let isPromptInputFocused = false;
+// function isPromptInput() {
+//     const promptInput = document.getElementById('prompt-input');
+//     promptInput.addEventListener('focus', () => {
+//         isPromptInputFocused = true;
+//     });
+//     promptInput.addEventListener('blur', () => {
+//         blurTimeoutId = setTimeout(() => {
+//             isPromptInputFocused = false;
+//         }, 1000);
+//     });
+// }
+// isPromptInput();
