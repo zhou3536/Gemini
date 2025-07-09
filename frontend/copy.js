@@ -22,7 +22,8 @@ function copycode() {
   
         // 将按钮添加到pre元素之后
         // preElement.parentNode.insertBefore(copyButton, preElement.nextSibling);  // 在pre元素之后插入
-        preElement.appendChild(copyButton);
+        // preElement.appendChild(copyButton);
+        preElement.parentNode.insertBefore(copyButton, preElement);
       });
     });
   
