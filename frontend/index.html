@@ -14,13 +14,18 @@
 <style></style>
 
 <body>
-    <div class="nav">Gemini
+    <div class="nav">
+        <select id="gemini-v" class="send-btn1">
+            <option value="gemini-2.0-flash">Gemini-2.0-Flash</option>
+            <option value="gemini-2.5-flash">Gemini-2.5-Flash</option>
+            <option value="gemini-2.5-pro">Gemini-2.5-Pro</option>
+        </select>
 
     </div>
     <div class="container">
         <ul id="history-list" class="list-1" onclick="closelist()"></ul>
         <ul id="list-123" class="list-1"></ul>
-        <main class="chat-area">
+        <main class="chat-area" id="chat-area">
             <div id="chat-window"></div>
             <div class="input-area">
                 <textarea id="prompt-input" placeholder="输入消息..." rows="2" onclick="closelist()"></textarea>
@@ -30,14 +35,8 @@
                     <div class="menu">
                         <button id="history-b" onclick="openlist()">历史记录</button>
                         <button id="new-chat-btn">新建对话</button>
-                        <select id="gemini-v" class="send-btn1">
-                            <option value="gemini-2.0-flash">2.0-flash</option>
-                            <option value="gemini-2.5-flash">2.5-flash</option>
-                            <option value="gemini-2.5-pro">2.5-pro</option>
-                        </select>
                         <button id="Search" class="search" onclick="Sch()">联网搜索</button>
                         <button id="send-btn" class="send-btn">
-                            <!-- <img src="sent.png" alt=""> -->
                         </button>
                         <label for="file-input" class="send-btn" hidden>文件</label>
 
@@ -58,7 +57,8 @@
             const historyList = document.getElementById('history-list');
             const fileInput = document.getElementById('file-input');
             const filePreviewContainer = document.getElementById('file-preview-container');
-
+            const chatarea = document.getElementById('chat-area');
+            
             // 应用状态
             let currentChatId = null;
             let currentFile = null;
@@ -389,7 +389,7 @@
 
             // --- 事件监听 ---
             sendBtn.addEventListener('click', sendMessage);
-            promptInput.addEventListener('keydown', (e) => {
+            chatarea.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();

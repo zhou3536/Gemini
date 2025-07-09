@@ -20,7 +20,7 @@ body {
     margin: 0;
     height: 100vh;
     height: 100dvh;
-    /* overflow: hidden; */
+    overflow: hidden;
 }
 
 
@@ -30,13 +30,37 @@ body {
     align-items: center;
     justify-content: center;
     padding: 0 15px;
-    gap: 10px;
+    gap: 5px;
     background: linear-gradient(to right, #6dd5ed, #b5efff);
-    font-size: 24px;
-    color: #253748;
+    font-size: 22px;
     font-weight: 700;
 }
 
+#gemini-v {
+    /* margin-left: auto; */
+    /* -webkit-appearance: none; */
+    /* -moz-appearance: none; */
+    /* appearance: none; */
+    background-color: rgba(52, 53, 65, 0.08);
+    color: #253748;
+    border-radius: 8px;
+    padding: 3px 8px;
+    cursor: pointer;
+    border: none;
+    font-size: 16px;
+    outline: none;
+    font-weight: 600;
+    /* box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3); */
+}
+
+#gemini-v option {
+    background-color: rgba(19, 23, 68, 0.7); 
+    color: #fff;
+    padding: 6px 3px;
+    outline: none;
+    border: none;
+    border-radius: 10px;
+}
 
 
 .container {
@@ -45,30 +69,6 @@ body {
     position: relative;
     overflow: hidden;
 }
-
-.nav select,
-.nav button {
-    background-color: rgba(52, 53, 65, 0.2);
-    color: #eee;
-    border-radius: 8px;
-    padding: 6px 10px;
-    cursor: pointer;
-    border: none;
-    font-size: 15px;
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.nav select {
-    padding: 6px 3px;
-    outline: none;
-}
-
-.nav select option {
-    background-color: #fff;
-    color: #333;
-}
-
-
 
 #history-list {
     width: 0;
@@ -284,7 +284,7 @@ body {
     margin-top: 6px;
     padding: 6px;
     padding-bottom: 3px;
-    border: 2px solid rgba(30, 173, 255, 0.6);
+    border: 2px solid rgba(30, 173, 255, 0.3);
 }
 
 #prompt-input {
@@ -312,27 +312,24 @@ body {
     display: flex;
 }
 
-.menu button,
-.menu select {
+.menu button {
     height: 25px;
     padding: 0 6px;
     background-color: transparent;
     border-radius: 5px;
     outline: none;
-    border: 1px solid rgba(30, 173, 255, 0.3);
+    border: 1px solid rgba(30, 173, 255, 0.4);
     display: block;
+    transition: all 0.1s ease-in-out;
+}
+.menu button:nth-child(1):active,
+.menu button:nth-child(2):active {
+    border: 1px solid rgba(30, 173, 255);
+    background-color: rgba(30, 173, 255, 0.2);
 }
 
-#gemini-v {
+#Search {
     margin-left: auto;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-.menu option {
-    background-color: rgba(0, 7, 85, 0.6);
-    color: #fff;
 }
 
 #send-btn {
