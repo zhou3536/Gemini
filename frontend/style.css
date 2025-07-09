@@ -74,15 +74,11 @@ body {
     width: 0;
     max-width: 300px;
     height: var(--hhh);
-    transition: all 0.3s ease;
     position: absolute;
+    border: none;
     z-index: 1000;
     right: 0;
     counter-reset: item-counter;
-}
-
-#history-list li:hover {
-    background-color: rgba(52, 53, 65, 0.15);
 }
 
 #list-123 {
@@ -102,7 +98,7 @@ body {
     overflow-y: auto;
     z-index: 999;
     border: 1px solid #e0e0e0;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .list-1:empty {

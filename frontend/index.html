@@ -58,7 +58,7 @@
             const fileInput = document.getElementById('file-input');
             const filePreviewContainer = document.getElementById('file-preview-container');
             const chatarea = document.getElementById('chat-area');
-            
+
             // 应用状态
             let currentChatId = null;
             let currentFile = null;
@@ -455,10 +455,14 @@
 
 
         function openlist() {
-            document.getElementById('history-list').style.width = '300px';
+            const a = document.getElementById('history-list');
+            a.style.width = '300px';
+            a.style.border = '1px solid #e0e0e0';
         }
         function closelist() {
-            document.getElementById('history-list').style.width = '0';
+            const a = document.getElementById('history-list');
+            a.style.width = '0';
+            a.style.border = 'none';
         }
 
         function generateUserMessageIndex() {
