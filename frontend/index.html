@@ -142,7 +142,8 @@
                     renderChatHistory(messages);
                     generateUserMessageIndex();
                     currentChatId = chatId;
-                    // **关键修改：加载成功后，将当前对话ID存入 localStorage**
+                    // 加载成功后
+                    copycode();
                     localStorage.setItem('currentActiveChatId', chatId);
                 } catch (error) {
                     console.error('Error loading chat history:', error);
@@ -310,6 +311,7 @@
 
                         hljs.highlightAll();
                         fetchAndRenderHistory();
+                        copycode();
                         return true; // 成功
 
                     } catch (error) {
@@ -413,47 +415,72 @@
                     filePreviewContainer.innerHTML = `<span>${currentFile.name}</span>`;
                 }
             });
+            //删除历史
+            window.del = del;
+            async function del(...indices) {
+                try {
+                    await fetch('/api/history/delete-by-indices', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json', },
+                        body: JSON.stringify({ indices: indices })
+                    });
+                    fetchAndRenderHistory();
+                    newChatBtn.click();
+                } catch (error) { console.error("删除请求失败:", error); }
+            }
+            //对话导航
+            function generateUserMessageIndex() {
+                const indexList = document.getElementById('list-123');
+                const userMessages = document.querySelectorAll('#chat-window .message.user-message');
+                indexList.innerHTML = '';
+                if (userMessages.length === 0) {
+                    return;
+                }
+                const listTitle = document.createElement('h4');
+                listTitle.textContent = '对话导航';
+                indexList.appendChild(listTitle);
+                userMessages.forEach((messageDiv, index) => {
+                    const messageId = `user-msg-${index}`;
+                    messageDiv.id = messageId;
+                    let messageText = messageDiv.querySelector('p')?.textContent || messageDiv.textContent;
+                    messageText = messageText.trim();
+                    if (!messageText) return;
+                    const displayText = messageText.length > 25 ? messageText.substring(0, 22) + '...' : messageText;
+                    const listItem = document.createElement('li');
+                    listItem.textContent = displayText;
+                    listItem.title = messageText;
+                    listItem.addEventListener('click', (event) => {
+                        const targetMessage = document.getElementById(messageId);
+                        if (targetMessage) {
+                            targetMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    });
+                    indexList.appendChild(listItem);
+                });
+            }
 
-            // --- 初始化 (修改点 4: 重写初始化逻辑) ---
+            // --- 初始化
             async function initializeApp() {
                 // 1. 总是获取并渲染历史列表
                 await fetchAndRenderHistory();
 
                 // 2. 检查localStorage中是否有缓存的对话ID
                 const cachedChatId = localStorage.getItem('currentActiveChatId');
-
                 if (cachedChatId) {
-                    // 如果有，就加载这个对话
-                    console.log(`Found cached chat ID: ${cachedChatId}. Loading...`);
                     await loadChatHistory(cachedChatId);
                 } else {
-                    // 如果没有，就打开一个新会话
-                    console.log('No cached chat ID found. Starting a new session.');
-                    renderChatHistory([]); // 清空并显示欢迎语
+                    renderChatHistory([]);
                     generateUserMessageIndex();
                 }
             }
-            window.del = del;
-            async function del(...indices) {
-                try {
-                    await fetch('/api/history/delete-by-indices', {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ indices: indices })
-                    });
-                    fetchAndRenderHistory();
-                    newChatBtn.click();
-                } catch (error) {
-                    console.error("删除请求失败:", error);
-                }
-            }
+
 
             initializeApp();
         });
 
 
+    </script>
+    <script>
         function openlist() {
             const a = document.getElementById('history-list');
             a.style.width = '300px';
@@ -463,36 +490,6 @@
             const a = document.getElementById('history-list');
             a.style.width = '0';
             a.style.border = 'none';
-        }
-
-        function generateUserMessageIndex() {
-            const indexList = document.getElementById('list-123');
-            const userMessages = document.querySelectorAll('#chat-window .message.user-message');
-            indexList.innerHTML = '';
-            if (userMessages.length === 0) {
-                return;
-            }
-            const listTitle = document.createElement('h4');
-            listTitle.textContent = '对话导航';
-            indexList.appendChild(listTitle);
-            userMessages.forEach((messageDiv, index) => {
-                const messageId = `user-msg-${index}`;
-                messageDiv.id = messageId;
-                let messageText = messageDiv.querySelector('p')?.textContent || messageDiv.textContent;
-                messageText = messageText.trim();
-                if (!messageText) return;
-                const displayText = messageText.length > 25 ? messageText.substring(0, 22) + '...' : messageText;
-                const listItem = document.createElement('li');
-                listItem.textContent = displayText;
-                listItem.title = messageText;
-                listItem.addEventListener('click', (event) => {
-                    const targetMessage = document.getElementById(messageId);
-                    if (targetMessage) {
-                        targetMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                });
-                indexList.appendChild(listItem);
-            });
         }
         //缓存选择
         const modelSelect = document.getElementById('gemini-v');
@@ -504,18 +501,6 @@
             modelSelect.value = savedValue;
         }
 
-
-
-
-        //改变输入框行数
-        // function adjustRows() {
-        //     var textarea = document.getElementById("prompt-input");
-        //     if (window.innerHeight > 650) { textarea.rows = 2; } else { textarea.rows = 1; }
-        // }
-        // window.onload = adjustRows;
-        // window.onresize = adjustRows;
-    </script>
-    <script>
         let SearchOn = false
         function Sch() {
             const aaa = document.getElementById('Search');
@@ -528,6 +513,7 @@
             }
         }
     </script>
+    <script src="copy.js"></script>
 </body>
 
 </html>
