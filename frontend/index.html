@@ -474,46 +474,10 @@
                 }
             }
 
-
             initializeApp();
         });
-
-
     </script>
-    <script>
-        function openlist() {
-            const a = document.getElementById('history-list');
-            a.style.width = '300px';
-            a.style.border = '1px solid #e0e0e0';
-        }
-        function closelist() {
-            const a = document.getElementById('history-list');
-            a.style.width = '0';
-            a.style.border = 'none';
-        }
-        //缓存选择
-        const modelSelect = document.getElementById('gemini-v');
-        modelSelect.addEventListener('change', function () {
-            localStorage.setItem('selectedModel', this.value);
-        });
-        const savedValue = localStorage.getItem('selectedModel');
-        if (savedValue) {
-            modelSelect.value = savedValue;
-        }
-
-        let SearchOn = false
-        function Sch() {
-            const aaa = document.getElementById('Search');
-            if (SearchOn) {
-                aaa.style.outline = 'none'
-                SearchOn = false
-            } else if (!SearchOn) {
-                aaa.style.outline = '1px solid #0073ed';
-                SearchOn = true
-            }
-        }
-    </script>
-    <script src="copy.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>

@@ -1,186 +1,42 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人网页</title>
-    <style>
-        /* 基本样式 */
-        body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        header,
-        nav,
-        main,
-        footer {
-            padding: 20px;
-        }
-
-        header {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-        }
-
-        nav {
-            background-color: #eee;
-        }
-
-        nav ul {
-            padding: 0;
-            list-style: none;
-            text-align: center;
-        }
-
-        nav li {
-            display: inline;
-            margin: 0 10px;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-        }
-
-        main {
-            max-width: 800px;
-            margin: 20px auto;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        section {
-            margin-bottom: 30px;
-        }
-
-        h2 {
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
-        }
-
-        .project {
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            padding: 10px;
-        }
-
-        .profile-image {
-            width: 200px;
-            border-radius: 50%;
-            float: left;
-            margin-right: 20px;
-        }
-
-        footer {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 10px;
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 600px) {
-            nav ul {
-                text-align: left;
-            }
-
-            nav li {
-                display: block;
-                margin: 5px 0;
-            }
-
-            .profile-image {
-                float: none;
-                display: block;
-                margin: 0 auto 20px;
-            }
-        }
-    </style>
+    <title>Document</title>
 </head>
-
+<style>
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+    div{
+        border: 1px solid #000;
+    }
+    .a{
+        width: 200px;
+        height: 200px;
+        margin: 20px;
+        padding: 10px;
+    }
+    .b{
+        width: 100px;
+        height: 100px;
+        margin: 10px;
+    }
+    .c{
+        width: 200px;
+        height: 200px;
+        margin: 5px;
+        outline: 1px solid #000;
+    }
+</style>
 <body>
-
-    <header>
-        <h1>你好，我是 [你的名字]</h1>
-        <p>一个 [你的职业/兴趣] 的人</p>
-    </header>
-
-    <nav>
-        <ul>
-            <li><a href="#about">关于我</a></li>
-            <li><a href="#projects">项目</a></li>
-            <li><a href="#contact">联系我</a></li>
-        </ul>
-    </nav>
-
-    <main>
-        <section id="about">
-            <h2>关于我</h2>
-            <img src="your-profile-image.jpg" alt="你的照片" class="profile-image">
-            <p>
-                在这里写一些关于你自己的信息。例如，你的背景、你的技能、你的兴趣爱好等等。
-                可以多写几段。
-            </p>
-            <p>
-                你也可以在这里添加一些额外的细节。
-            </p>
-        </section>
-
-        <section id="projects">
-            <h2>项目</h2>
-            <div class="project">
-                <h3>项目名称 1</h3>
-                <p>项目描述 1. 简要介绍一下这个项目是做什么的，以及你在其中扮演的角色。</p>
-                <a href="#">查看项目</a>
-            </div>
-
-            <div class="project">
-                <h3>项目名称 2</h3>
-                <p>项目描述 2. 简要介绍一下这个项目是做什么的，以及你在其中扮演的角色。</p>
-                <a href="#">查看项目</a>
-            </div>
-        </section>
-
-        <section id="contact">
-            <h2>联系我</h2>
-            <p>你可以通过以下方式联系我：</p>
-            <ul>
-                <li>邮箱： <a href="mailto:your-email@example.com">your-email@example.com</a></li>
-                <li>GitHub: <a href="https://github.com/your-github-username">github.com/your-github-username</a></li>
-                <li>LinkedIn: <a
-                        href="https://www.linkedin.com/in/your-linkedin-profile">linkedin.com/in/your-linkedin-profile</a>
-                </li>
-            </ul>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2023 [你的名字]. 保留所有权利。</p>
-    </footer>
-
-    <script>
-        // 这里可以添加一些简单的 JavaScript 交互，例如平滑滚动到 sections
-
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-    </script>
+    
+    <div class="a">
+        <div class="b"></div>
+    </div>
+    <div class="c"></div>
 </body>
-
 </html>
