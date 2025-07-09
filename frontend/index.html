@@ -23,7 +23,7 @@
         <main class="chat-area">
             <div id="chat-window"></div>
             <div class="input-area">
-                <textarea id="prompt-input" placeholder="输入消息..." rows="2"></textarea>
+                <textarea id="prompt-input" placeholder="输入消息..." rows="2" onclick="closelist()"></textarea>
                 <input type="file" id="file-input" hidden>
                 <div class="send-box">
                     <div id="file-preview-container"></div>
@@ -99,7 +99,7 @@
             function renderChatHistory(messages) {
                 chatWindow.innerHTML = '';
                 if (!messages || messages.length === 0) {
-                    renderMessage('gemini', 'Hello! 有什么可以帮助你？'); // 欢迎语
+                    renderMessage('gemini', 'Hello! 今天有什么可以帮你？');
                     return;
                 }
                 messages.forEach(msg => {
@@ -364,36 +364,13 @@
                         errorMessage += error.message || '未知错误';
                     }
 
-                    // 显示错误信息和重试按钮
+                    // 显示错误信息
                     const errorDiv = document.createElement('div');
                     errorDiv.style.color = '#ff6b6b';
-                    errorDiv.style.padding = '10px';
-                    errorDiv.style.border = '1px solid #ff6b6b';
-                    errorDiv.style.borderRadius = '5px';
-                    errorDiv.style.backgroundColor = '#fff5f5';
-                    errorDiv.style.margin = '10px 0';
-
                     const errorText = document.createElement('p');
                     errorText.textContent = errorMessage;
                     errorText.style.margin = '0 0 10px 0';
-
-                    const retryBtn = document.createElement('button');
-                    retryBtn.textContent = '重试';
-                    retryBtn.style.padding = '5px 10px';
-                    retryBtn.style.backgroundColor = '#ff6b6b';
-                    retryBtn.style.color = 'white';
-                    retryBtn.style.border = 'none';
-                    retryBtn.style.borderRadius = '3px';
-                    retryBtn.style.cursor = 'pointer';
-                    retryBtn.onclick = () => {
-                        // 移除错误消息并重新发送
-                        aiMessageDiv.remove();
-                        sendMessage();
-                    };
-
                     errorDiv.appendChild(errorText);
-                    errorDiv.appendChild(retryBtn);
-
                     aiMessageDiv.innerHTML = '';
                     aiMessageDiv.appendChild(errorDiv);
 

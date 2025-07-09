@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 3001;
-const host = '127.0.0.1';
+const host = process.env.HOST || '127.0.0.1';
 const HISTORIES_DIR = path.join(__dirname, 'histories');
 
 // Multer 配置，用于处理文件上传（保存在内存中）
@@ -349,8 +349,7 @@ app.delete('/api/history/delete-by-indices', async (req, res) => {
         const files = await fs.readdir(HISTORIES_DIR);
         const jsonFiles = files.filter(file => file.endsWith('.json')).sort().reverse();
         // 构建要删除的文件路径
-        const filesToDelete = indices.map(index => path.join(HISTORIES_DIR, jsonFiles[index])).filter(filePath => filePath !== undefined); 
-        // 删除文件
+        const filesToDelete = indices.map(index => path.join(HISTORIES_DIR, jsonFiles[index - 1])).filter(filePath => filePath !== undefined); 
         for (const filePath of filesToDelete) {
             try {
                 await fs.unlink(filePath);
