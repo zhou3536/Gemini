@@ -20,11 +20,11 @@
             <option value="gemini-2.5-flash">Gemini-2.5-Flash</option>
             <option value="gemini-2.5-pro">Gemini-2.5-Pro</option>
         </select>
-
+        <button onclick="opendhdh()">⇄</button>
     </div>
     <div class="container">
         <ul id="history-list" class="list-1" onclick="closelist()"></ul>
-        <ul id="list-123" class="list-1"></ul>
+        <ul id="list-dhdh" class="list-1"></ul>
         <main class="chat-area" id="chat-area">
             <div id="chat-window"></div>
             <div class="input-area">
@@ -430,7 +430,7 @@
             }
             //对话导航
             function generateUserMessageIndex() {
-                const indexList = document.getElementById('list-123');
+                const indexList = document.getElementById('list-dhdh');
                 const userMessages = document.querySelectorAll('#chat-window .message.user-message');
                 indexList.innerHTML = '';
                 if (userMessages.length === 0) {

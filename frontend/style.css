@@ -35,6 +35,11 @@ body {
     font-weight: 700;
 }
 
+.nav button {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
 #gemini-v {
     /* margin-left: auto; */
     /* -webkit-appearance: none; */
@@ -53,7 +58,7 @@ body {
 }
 
 #gemini-v option {
-    background-color: rgba(19, 23, 68, 0.7); 
+    background-color: rgba(19, 23, 68, 0.7);
     color: #fff;
     padding: 6px 3px;
     outline: none;
@@ -80,7 +85,7 @@ body {
     counter-reset: item-counter;
 }
 
-#list-123 {
+#list-dhdh {
     position: absolute;
     right: 3px;
     top: 3px;
@@ -130,12 +135,6 @@ body {
     margin-right: 0.3em;
 }
 
-@media (max-width: 1000px) {
-    #list-123 {
-        display: none;
-    }
-}
-
 .chat-area {
     background-color: rgba(255, 255, 255, 0.5);
     width: 100vw;
@@ -146,6 +145,7 @@ body {
     top: 0;
     transform: translateX(-50%);
     height: var(--hhh);
+    /* scroll-padding-top: var(--navh); */
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -236,15 +236,16 @@ body {
 .gemini-message.loading::before {
     animation: spin 1s linear infinite;
 }
+
 @keyframes fadeIn {
     from {
-      opacity: 0;
+        opacity: 0;
     }
-  
+
     to {
-      opacity: 1;
+        opacity: 1;
     }
-  }
+}
 
 @keyframes spin {
     from {
@@ -261,6 +262,7 @@ body {
 }
 
 @keyframes fade {
+
     0%,
     100% {
         opacity: 1;
@@ -307,9 +309,9 @@ body {
     /* background-color: #922b2b; */
 }
 
-.input-area:focus-within {
+/* .input-area:focus-within {
     border: 2px solid #1eacff;
-}
+} */
 
 .send-box {
     position: relative;
@@ -326,14 +328,22 @@ body {
     display: block;
     transition: all 0.1s ease-in-out;
 }
+
 .menu button:nth-child(1):active,
 .menu button:nth-child(2):active {
     border: 1px solid rgba(30, 173, 255);
     background-color: rgba(30, 173, 255, 0.2);
 }
 
-#Search {
+.menu .search {
     margin-left: auto;
+    color: #aaa;
+}
+
+.menu .SearchON {
+    border: none;
+    color: #0073ed;
+    border: 1px solid #0073ed;
 }
 
 #send-btn {
@@ -386,6 +396,33 @@ body {
         padding: 5px;
     }
 }
+
+@media (max-width: 1000px) {
+    .nav {
+        position: relative;
+    }
+
+    #list-dhdh {
+        width: 0;
+        border-width: 0;
+    }
+
+    .nav button {
+        display: block;
+        position: absolute;
+        right: 10px;
+        padding: 2px 10px;
+        border-radius: 5px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        background-color: rgba(26, 25, 27, 0.1);
+    }
+
+    .nav button:active {
+        border: 1px solid rgba(0, 0, 0, 0.4);
+        background-color: rgba(26, 25, 27, 0.25);
+    }
+}
+
 
 /* 滚动条 */
 @media (min-width: 1000px) {
