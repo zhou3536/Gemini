@@ -1,3 +1,23 @@
+:root {
+    --perbgc: #f8f9fa;
+    --per-df: #2c3e50;
+    --code: #6b0000;
+    --hljs-string: #718c00;
+    --hljs-keyword: #8959a8;
+    --hljs-function: #4271ae;
+}
+
+[data-theme="dark"] {
+    --perbgc: transition;
+    --per-df: #eee;
+    --code: #ffabab;
+    --hljs-string: #b0c461;
+    --hljs-keyword: #d5a6f4;
+    --hljs-function: #88bafc;
+}
+
+
+
 /* AI回复内容的Markdown样式优化 */
 .gemini-message h1,
 .gemini-message h2,
@@ -5,7 +25,7 @@
 .gemini-message h4,
 .gemini-message h5,
 .gemini-message h6 {
-    color: #2c3e50;
+    /* color: #2c3e50; */
     font-weight: 600;
     margin: 16px 0 8px 0;
     line-height: 1.4;
@@ -19,13 +39,13 @@
 
 .gemini-message h2 {
     font-size: 1.4em;
-    border-bottom: 1px solid #bdc3c7;
+    border-bottom: 1px solid #3498db;
     padding-bottom: 6px;
 }
 
 .gemini-message h3 {
     font-size: 1.2em;
-    color: #34495e;
+    /* color: #34495e; */
 }
 
 .gemini-message p {
@@ -37,9 +57,9 @@
 
 /* 代码块样式 */
 .gemini-message pre {
-    background-color: #f8f9fa;
-    border: 1px solid #e1e8ed;
-    border-radius: 8px;
+    background-color: var(--perbgc);
+    border: 1px solid var(--df-01);
+    border-radius: 5px;
     padding: 16px;
     margin: 16px 0;
     overflow-x: auto;
@@ -59,13 +79,13 @@
 
 /* 行内代码样式 */
 .gemini-message code {
-    background-color: rgba(0, 0, 0, 0.06);
-    color: #6b0000;
+    background-color: var(--df-005);
+    color: var(--code);
     padding: 2px 6px;
     border-radius: 4px;
     /* font-family: 'Monaco', 'Consolas', 'Courier New', monospace; */
     font-size: 15px;
-    border: 1px solid #e1e8ed;
+    /* border: 1px solid #e1e8ed; */
     font-weight: normal;
 }
 
@@ -76,7 +96,7 @@
     margin: 16px 0;
     padding: 12px 16px;
     border-radius: 0 8px 8px 0;
-    color: #555;
+    /* color: #555; */
     font-style: italic;
 }
 
@@ -126,7 +146,7 @@
 .gemini-message th {
     background-color: #f8f9fa;
     font-weight: 600;
-    color: #2c3e50;
+    /* color: #2c3e50; */
 }
 
 .gemini-message tr:nth-child(even) {
@@ -154,12 +174,12 @@
 
 /* 强调文本样式 */
 .gemini-message strong {
-    color: #222;
+    /* color: #222; */
     font-weight: 550;
 }
 
 .gemini-message em {
-    color: #7f8c8d;
+    /* color: #7f8c8d; */
     font-style: italic;
 }
 
@@ -182,8 +202,8 @@
 
 /* 高亮代码的特殊样式调整 */
 .gemini-message .hljs {
-    background: #f8f9fa !important;
-    color: #2c3e50 !important;
+    /* background: #f8f9fa !important; */
+    color: var(--per-df) !important;
 }
 
 .gemini-message .hljs-comment {
@@ -191,11 +211,11 @@
 }
 
 .gemini-message .hljs-keyword {
-    color: #8959a8 !important;
+    color: var(--hljs-keyword) !important;
 }
 
 .gemini-message .hljs-string {
-    color: #718c00 !important;
+    color: var(--hljs-string) !important;
 }
 
 .gemini-message .hljs-number {
@@ -203,35 +223,40 @@
 }
 
 .gemini-message .hljs-function {
-    color: #4271ae !important;
+    color: var(--hljs-function) !important;
 }
 
 .gemini-message .copy-button {
     width: 34px;
     height: 16px;
     display: block;
-    color: #888;
-    margin: 16px 3px -34px auto;
+    color: var(--df-ziti);
+    margin: 16px 2px -34px auto;
     font-size: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius:5px;
+    border: 1px solid var(--df-01);
+    border-radius: 3px;
     padding: 1px 3px;
     position: relative;
     z-index: 10;
+    background-color: transparent;
 }
-.gemini-message .copy-button:hover{
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    background-color: rgba(0, 0, 0, 0.1);
+
+.gemini-message .copy-button:hover {
+    border: 1px solid var(--df-02);
+    background-color: var(--df-02);
 }
-.gemini-message .copy-button:active{
-    border: 1px solid rgba(0, 0, 0, 0.5);
-    background-color: rgba(0, 0, 0, 0.2);
+
+.gemini-message .copy-button:active {
+    border: 1px solid var(--df-04);
+    background-color: var(--df-04);
 }
-.gemini-message .copy-button::before{
+
+.gemini-message .copy-button::before {
     content: "Copy";
     margin: auto;
 }
-.gemini-message .copy-button-OK::before{
+
+.gemini-message .copy-button-OK::before {
     content: "OK";
     color: #007820;
 }

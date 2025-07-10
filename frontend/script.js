@@ -16,7 +16,7 @@ function copycode() {
                 // 调用复制到剪贴板函数
                 copyToClipboard(textToCopy);
                 copyButton.classList.add('copy-button-OK');
-                setTimeout(() => {copyButton.classList.remove('copy-button-OK');}, 1500);
+                setTimeout(() => { copyButton.classList.remove('copy-button-OK'); }, 1500);
             });
             // preElement.parentNode.insertBefore(copyButton, preElement.nextSibling);  // 在pre元素之后插入
             // preElement.appendChild(copyButton);   // 在pre元素里插入
@@ -136,3 +136,62 @@ function opendhdh() {
 //     });
 // }
 // isPromptInput();
+
+//切换主题
+document.addEventListener('DOMContentLoaded', function () {
+    const selectElement = document.getElementById('lightdark');
+
+    // 函数：设置主题
+    function setTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark'); // 保存到 localStorage
+        } else if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light'); // 保存到 localStorage
+        } else {
+            document.documentElement.removeAttribute('data-theme'); // 移除 data-theme 属性，使用默认颜色
+            localStorage.removeItem('theme'); // 移除 localStorage 中的 theme
+        }
+    }
+
+    // 监听选择框的 change 事件
+    selectElement.addEventListener('change', function () {
+        const selectedValue = selectElement.value;
+        setTheme(selectedValue);
+    });
+
+    // 页面加载时，从 localStorage 中读取主题设置
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        setTheme(savedTheme);
+        selectElement.value = savedTheme; // 更新选择框的选中值
+    } else {
+        // 如果 localStorage 中没有保存的主题，则使用自动模式
+        selectElement.value = 'auto';
+    }
+
+    //自动模式判断
+    function autoTheme() {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) {
+            setTheme('dark');
+            selectElement.value = 'auto';
+        } else {
+            setTheme('light');
+            selectElement.value = 'auto';
+        }
+    }
+
+    // 监听系统主题变化（仅在选择“自动”时生效）
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+        if (selectElement.value === 'auto') {
+            autoTheme();
+        }
+    });
+
+    // 初始加载时，如果是自动模式，则判断系统主题
+    if (selectElement.value === 'auto') {
+        autoTheme();
+    }
+});

@@ -8,13 +8,20 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="md.css">
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script> -->
+     <script src="highlight.min.js"></script>
+     <script src="marked.min.js"></script>
 </head>
 <style></style>
 
 <body>
     <div class="nav">
+        <select id="lightdark" class="send-btn1">
+            <option value="auto">Auto</option>
+            <option value="light">白天</option>
+            <option value="dark">黑夜</option>
+        </select>
         <select id="gemini-v" class="send-btn1">
             <option value="gemini-2.0-flash">Gemini-2.0-Flash</option>
             <option value="gemini-2.5-flash">Gemini-2.5-Flash</option>
@@ -165,7 +172,7 @@
                     model: selectedModel,
                     searchEnabled: SearchOn
                 };
-                
+
                 if (currentChatId) {
                     requestBody.chatId = currentChatId;
                 }
