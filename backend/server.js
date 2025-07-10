@@ -86,7 +86,7 @@ app.post('/api/chat', async (req, res) => {
         const modelName = req.body.model;
 
         // 将字符串转换为布尔值
-        const isSearchEnabled = searchEnabled === 'true';
+        const isSearchEnabled = searchEnabled === true;
 
         console.log(`Using model: ${modelName} for chat: ${chatId || 'New Chat'}, Search: ${isSearchEnabled}`);
 
