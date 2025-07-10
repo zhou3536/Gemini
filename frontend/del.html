@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat History</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #F0F8FF;
+
+        }
+
+        .cont {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        h3 {
+            margin-bottom: 8px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            border-radius: 8px;
+            margin-bottom: 6px;
+            border: 1px solid #ccc;
+            padding: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+        }
+
+        li span {
+            display: block;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        button {
+            width: 60px;
+            height: 30px;
+            /* margin-right: 5px; */
+            border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.1);
+            color: #762121;
+            border: none;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            /* display: inline-block; */
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cont">
+        <h3>管理历史</h3>
+        <h3><a href="/">返回主页</a></h3>
+        <ul id="historyList"></ul>
+    </div>
+    <script>
+        const historyList = document.getElementById('historyList');
+
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/history');
+                const history = await response.json();
+
+                historyList.innerHTML = '';
+
+                history.forEach((item, index) => {
+                    const listItem = document.createElement('li');
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = `${index + 1}. ${item.title}`;
+                    listItem.appendChild(titleSpan);
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = '删除';
+                    deleteButton.onclick = () => deleteHistory(item.chatId);
+                    listItem.appendChild(deleteButton);
+
+                    listItem.appendChild(document.createTextNode(' ')); // Add space between title and button
+
+
+                    historyList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Failed to load history:', error);
+                historyList.innerHTML = '<li>Failed to load history.</li>';
+            }
+        }
+
+        async function deleteHistory(chatId) {
+            try {
+                const response = await fetch(`/api/history/${chatId}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    console.log(`History ${chatId} deleted successfully.`);
+                    loadHistory();
+                } else {
+                    console.error(`Failed to delete history ${chatId}.`);
+                    alert(`Failed to delete history ${chatId}.`);
+                }
+            } catch (error) {
+                console.error('Error deleting history:', error);
+                alert('Error deleting history.');
+            }
+        }
+
+        // Load history on page load
+        loadHistory();
+    </script>
+</body>
+
+</html>

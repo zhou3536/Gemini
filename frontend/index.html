@@ -107,7 +107,11 @@
                     historyList.innerHTML = '';
                     const listTitle = document.createElement('h4');
                     listTitle.textContent = '关闭列表';
+                    const DelHistory = document.createElement('a');
+                    DelHistory.textContent = '管理历史';
+                    DelHistory.href = 'del.html';
                     historyList.appendChild(listTitle);
+                    historyList.appendChild(DelHistory);
                     histories.forEach(h => {
                         const li = document.createElement('li');
                         li.textContent = h.title;
@@ -399,19 +403,6 @@
                 generateUserMessageIndex();
             });
 
-            //删除历史
-            window.del = del;
-            async function del(...indices) {
-                try {
-                    await fetch('/api/history/delete-by-indices', {
-                        method: 'DELETE',
-                        headers: { 'Content-Type': 'application/json', },
-                        body: JSON.stringify({ indices: indices })
-                    });
-                    fetchAndRenderHistory();
-                    newChatBtn.click();
-                } catch (error) { console.error("删除请求失败:", error); }
-            }
             //对话导航
             function generateUserMessageIndex() {
                 const indexList = document.getElementById('list-dhdh');

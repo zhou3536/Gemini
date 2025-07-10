@@ -110,8 +110,10 @@ body {
     display: none;
 }
 
+.list-1 a,
 .list-1 li,
 .list-1 h4 {
+    display: block;
     padding: 3px 6px;
     font-size: 14px;
     color: #333;
@@ -120,12 +122,20 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-decoration: none;
+}
+
+.list-1 a,
+.list-1 h4 {
+    font-weight: 600;
 }
 
 .list-1 li:last-child {
     border-bottom: none;
 }
 
+.list-1 a:hover,
+.list-1 h4:hover,
 .list-1 li:hover {
     background-color: rgba(0, 0, 0, 0.1);
 }

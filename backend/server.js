@@ -43,12 +43,12 @@ app.post('/api/chat', async (req, res) => {
     let fullResponseText = '';
     let history = [];
     let newChatId = null;
-    
+
     // 设置响应头
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
-    
+
     // 安全发送响应的函数
     const safeSend = (data) => {
         if (!isResponseSent && !res.destroyed) {
@@ -91,7 +91,7 @@ app.post('/api/chat', async (req, res) => {
         console.log(`Using model: ${modelName} for chat: ${chatId || 'New Chat'}, Search: ${isSearchEnabled}`);
 
         // 根据搜索状态配置模型
-        const modelConfig = { 
+        const modelConfig = {
             model: modelName,
             generationConfig: {
                 temperature: 0.7,
@@ -137,47 +137,47 @@ app.post('/api/chat', async (req, res) => {
         while (currentRetry < maxRetries && !success && !isResponseSent) {
             try {
                 console.log(`Attempting to send message (attempt ${currentRetry + 1}/${maxRetries})`);
-                
+
                 const result = await chat.sendMessageStream(messageParts);
-                
+
                 let chunkCount = 0;
                 const startTime = Date.now();
-                
+
                 for await (const chunk of result.stream) {
                     if (isResponseSent) break;
-                    
+
                     const chunkText = chunk.text();
                     if (!chunkText) continue;
-                    
+
                     fullResponseText += chunkText;
                     chunkCount++;
-                    
+
                     const responseData = {
                         reply: chunkText,
                         chatId: newChatId,
                         chunkIndex: chunkCount,
                         timestamp: Date.now()
                     };
-                    
+
                     if (!safeSend(responseData)) {
                         console.log('Failed to send chunk, client may have disconnected');
                         break;
                     }
-                    
+
                     // 添加少量延迟，避免过快的数据流
                     if (chunkCount % 10 === 0) {
                         await delay(10);
                     }
                 }
-                
+
                 const endTime = Date.now();
                 console.log(`Stream completed successfully in ${endTime - startTime}ms with ${chunkCount} chunks`);
                 success = true;
-                
+
             } catch (streamError) {
                 currentRetry++;
                 console.error(`Stream error (attempt ${currentRetry}/${maxRetries}):`, streamError);
-                
+
                 if (currentRetry < maxRetries) {
                     // 发送重试通知给客户端
                     safeSend({
@@ -186,7 +186,7 @@ app.post('/api/chat', async (req, res) => {
                         maxRetries: maxRetries,
                         chatId: newChatId
                     });
-                    
+
                     // 等待一段时间再重试
                     await delay(1000 * currentRetry);
                 } else {
@@ -211,7 +211,7 @@ app.post('/api/chat', async (req, res) => {
                 parts: [{ text: fullResponseText }]
             };
             const updatedHistory = [...history, userMessage, modelResponse];
-            
+
             try {
                 const newFilePath = path.join(HISTORIES_DIR, `${newChatId}.json`);
                 await fs.writeFile(newFilePath, JSON.stringify(updatedHistory, null, 2));
@@ -235,7 +235,7 @@ app.post('/api/chat', async (req, res) => {
 
     } catch (error) {
         console.error('Chat API Error:', error);
-        
+
         // 根据错误类型提供不同的错误信息
         let errorMessage = 'Server error occurred';
         if (error.message?.includes('Failed to parse stream')) {
@@ -247,8 +247,8 @@ app.post('/api/chat', async (req, res) => {
         } else {
             errorMessage = `Server error: ${error.message}`;
         }
-        
-        safeSend({ 
+
+        safeSend({
             error: errorMessage,
             chatId: newChatId || `error_${Date.now()}`,
             canRetry: !error.message?.includes('quota')
@@ -259,33 +259,33 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // 获取最新对话
-app.get('/api/chat/latest', async (req, res) => {
-    try {
-        const files = await fs.readdir(HISTORIES_DIR);
-        const jsonFiles = files
-            .filter(file => file.endsWith('.json'))
-            .sort()
-            .reverse();
+// app.get('/api/chat/latest', async (req, res) => {
+//     try {
+//         const files = await fs.readdir(HISTORIES_DIR);
+//         const jsonFiles = files
+//             .filter(file => file.endsWith('.json'))
+//             .sort()
+//             .reverse();
 
-        if (jsonFiles.length === 0) {
-            return res.json({ chatId: null, messages: [] });
-        }
+//         if (jsonFiles.length === 0) {
+//             return res.json({ chatId: null, messages: [] });
+//         }
 
-        const latestFile = jsonFiles[0];
-        const chatId = latestFile.replace('.json', '');
-        const filePath = path.join(HISTORIES_DIR, latestFile);
-        const data = await fs.readFile(filePath, 'utf-8');
-        const messages = JSON.parse(data);
-        res.json({ chatId, messages });
+//         const latestFile = jsonFiles[0];
+//         const chatId = latestFile.replace('.json', '');
+//         const filePath = path.join(HISTORIES_DIR, latestFile);
+//         const data = await fs.readFile(filePath, 'utf-8');
+//         const messages = JSON.parse(data);
+//         res.json({ chatId, messages });
 
-    } catch (error) {
-        if (error.code === 'ENOENT') {
-            return res.json({ chatId: null, messages: [] });
-        }
-        console.error('Error fetching latest chat:', error);
-        res.status(500).json({ error: 'Failed to retrieve the latest chat.' });
-    }
-});
+//     } catch (error) {
+//         if (error.code === 'ENOENT') {
+//             return res.json({ chatId: null, messages: [] });
+//         }
+//         console.error('Error fetching latest chat:', error);
+//         res.status(500).json({ error: 'Failed to retrieve the latest chat.' });
+//     }
+// });
 
 // 获取历史列表
 app.get('/api/history', async (req, res) => {
@@ -327,25 +327,17 @@ app.get('/api/history/:chatId', async (req, res) => {
 });
 
 // --- 删除历史记录接口 ---
-app.delete('/api/history/delete-by-indices', async (req, res) => {
+app.delete('/api/history/:chatId', async (req, res) => {
+    const chatId = req.params.chatId;
+    const filePath = path.join(HISTORIES_DIR, `${chatId}.json`);
+
     try {
-        const { indices } = req.body;
-        const files = await fs.readdir(HISTORIES_DIR);
-        const jsonFiles = files.filter(file => file.endsWith('.json')).sort().reverse();
-        // 构建要删除的文件路径
-        const filesToDelete = indices.map(index => path.join(HISTORIES_DIR, jsonFiles[index - 1])).filter(filePath => filePath !== undefined); 
-        for (const filePath of filesToDelete) {
-            try {
-                await fs.unlink(filePath);
-                console.log(`Deleted history file: ${filePath}`);
-            } catch (deleteError) {
-                console.error(`Error deleting file ${filePath}:`, deleteError);
-            }
-        }
-        res.status(204).send(); 
+        await fs.unlink(filePath);
+        console.log(`History ${chatId} deleted.`);
+        res.status(200).json({ message: `History ${chatId} deleted successfully.` });
     } catch (error) {
-        console.error('Error deleting history by indices:', error);
-        res.status(500).json({ error: 'Failed to delete history.' });
+        console.error(`Error deleting history ${chatId}:`, error);
+        res.status(500).json({ error: `Failed to delete history ${chatId}.` });
     }
 });
 
