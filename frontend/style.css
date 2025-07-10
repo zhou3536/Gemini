@@ -162,6 +162,11 @@ body {
     padding-top: 48px;
     line-height: 1.2;
     animation: fadeIn 0.3s ease;
+    border-bottom: 2px solid #e9f6ff;
+}
+
+.message:last-child {
+    border-bottom: none
 }
 
 .message p {
@@ -172,7 +177,6 @@ body {
 
 .user-message {
     position: relative;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 
@@ -330,6 +334,7 @@ body {
     transition: all 0.1s ease-in-out;
     cursor: pointer;
 }
+
 .menu button:nth-child(1):active,
 .menu button:nth-child(2):active {
     border: 1px solid rgba(30, 173, 255);
