@@ -29,15 +29,12 @@
             <div id="chat-window"></div>
             <div class="input-area">
                 <textarea id="prompt-input" placeholder="输入消息..." rows="2" onclick="closelist()"></textarea>
-                <input type="file" id="file-input" hidden>
                 <div class="send-box">
-                    <div id="file-preview-container"></div>
                     <div class="menu">
                         <button id="history-b" onclick="openlist()">历史记录</button>
                         <button id="new-chat-btn">新建对话</button>
                         <button id="Search" class="search" onclick="Sch()">联网搜索</button>
                         <button id="send-btn" class="send-btn"></button>
-                        <label for="file-input" class="send-btn" hidden>文件</label>
                     </div>
                 </div>
 
@@ -53,13 +50,10 @@
             const sendBtn = document.getElementById('send-btn');
             const newChatBtn = document.getElementById('new-chat-btn');
             const historyList = document.getElementById('history-list');
-            const fileInput = document.getElementById('file-input');
-            const filePreviewContainer = document.getElementById('file-preview-container');
             const chatarea = document.getElementById('chat-area');
 
             // 应用状态
             let currentChatId = null;
-            let currentFile = null;
 
             // --- 配置 marked.js 和 highlight.js ---
             if (typeof marked !== 'undefined' && typeof hljs !== 'undefined') {
@@ -155,24 +149,21 @@
                 const prompt = promptInput.value.trim();
                 const modelSelect = document.getElementById('gemini-v');
                 const selectedModel = modelSelect.value;
-                if (!prompt && !currentFile) return;
+                if (!prompt) return;
 
                 sendBtn.disabled = true;
-                renderMessage('user', prompt || `已发送文件: ${currentFile.name}`);
+                renderMessage('user', prompt);
                 promptInput.value = '';
-                filePreviewContainer.innerHTML = '';
                 chatWindow.scrollTop = chatWindow.scrollHeight;
 
-                const formData = new FormData();
-                formData.append('prompt', prompt);
-                formData.append('model', selectedModel);
-                formData.append('searchEnabled', SearchOn);
+                const requestBody = {
+                    prompt: prompt,
+                    model: selectedModel,
+                    searchEnabled: SearchOn
+                };
+                
                 if (currentChatId) {
-                    formData.append('chatId', currentChatId);
-                }
-                if (currentFile) {
-                    formData.append('file', currentFile);
-                    currentFile = null;
+                    requestBody.chatId = currentChatId;
                 }
 
                 const aiMessageDiv = document.createElement('div');
@@ -202,7 +193,10 @@
                     try {
                         response = await fetch('/api/chat', {
                             method: 'POST',
-                            body: formData,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(requestBody),
                             signal: AbortSignal.timeout(120000) // 2分钟超时
                         });
 
@@ -400,19 +394,11 @@
             newChatBtn.addEventListener('click', () => {
                 localStorage.removeItem('currentActiveChatId');
                 currentChatId = null;
-                currentFile = null;
                 chatWindow.innerHTML = '';
-                filePreviewContainer.innerHTML = '';
                 renderChatHistory([]); // 清空并显示欢迎语
                 generateUserMessageIndex();
             });
 
-            fileInput.addEventListener('change', (e) => {
-                currentFile = e.target.files[0];
-                if (currentFile) {
-                    filePreviewContainer.innerHTML = `<span>${currentFile.name}</span>`;
-                }
-            });
             //删除历史
             window.del = del;
             async function del(...indices) {

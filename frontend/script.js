@@ -65,11 +65,13 @@ function openlist() {
     const a = document.getElementById('history-list');
     a.style.width = '300px';
     a.style.border = '1px solid #e0e0e0';
+    a.style.transition = 'all 0.3s ease';
 }
 function closelist() {
     const a = document.getElementById('history-list');
     a.style.width = '0';
     a.style.border = 'none';
+    a.style.transition = 'none';
 }
 //缓存选择
 const modelSelect = document.getElementById('gemini-v');

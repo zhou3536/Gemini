@@ -22,9 +22,6 @@ const port = process.env.PORT || 3001;
 const host = process.env.HOST || '127.0.0.1';
 const HISTORIES_DIR = path.join(__dirname, 'histories');
 
-// Multer 配置，用于处理文件上传（保存在内存中）
-const upload = multer({ storage: multer.memoryStorage() });
-
 // Gemini AI 配置
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -33,15 +30,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
-// --- 辅助函数 ---
-function fileToGenerativePart(buffer, mimeType) {
-    return {
-        inlineData: {
-            data: buffer.toString('base64'),
-            mimeType,
-        },
-    };
-}
 
 // 延迟函数，用于重试
 function delay(ms) {
@@ -51,7 +39,7 @@ function delay(ms) {
 // --- API 路由 ---
 
 // 核心聊天接口
-app.post('/api/chat', upload.single('file'), async (req, res) => {
+app.post('/api/chat', async (req, res) => {
     let isResponseSent = false;
     let fullResponseText = '';
     let history = [];
@@ -134,13 +122,10 @@ app.post('/api/chat', upload.single('file'), async (req, res) => {
 
         const chat = model.startChat({ history });
 
+        // 只处理文本消息
         const messageParts = [];
         if (prompt) {
             messageParts.push({ text: prompt });
-        }
-        if (req.file) {
-            const filePart = fileToGenerativePart(req.file.buffer, req.file.mimetype);
-            messageParts.push(filePart);
         }
 
         newChatId = chatId || `${Date.now()}`;
@@ -364,6 +349,7 @@ app.delete('/api/history/delete-by-indices', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete history.' });
     }
 });
+
 // --- 启动服务器 ---
 app.listen(port, host, () => {
     fs.mkdir(HISTORIES_DIR, { recursive: true });
