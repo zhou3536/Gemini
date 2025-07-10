@@ -2,7 +2,6 @@
 console.log('Service is trying to start...');
 // --- 模块导入 (统一使用 ES Modules) ---
 import express from 'express';
-import multer from 'multer';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import cors from 'cors';

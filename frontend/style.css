@@ -328,6 +328,7 @@ body {
     border: 1px solid rgba(30, 173, 255, 0.4);
     display: block;
     transition: all 0.1s ease-in-out;
+    cursor: pointer;
 }
 .menu button:nth-child(1):active,
 .menu button:nth-child(2):active {
@@ -342,8 +343,9 @@ body {
 
 .menu .SearchON {
     border: none;
-    color: #0073ed;
-    border: 1px solid #0073ed;
+    color: #000;
+    border: 1px solid #5aaaff;
+    background: linear-gradient(to right, #c8eaff 0%, #ffd4e0 100%);
 }
 
 #send-btn {
@@ -357,28 +359,6 @@ body {
     width: 30px;
     height: 30px;
 }
-
-/* .send-btn img {
-    display: block;
-    width: 30px;
-} */
-
-#file-preview-container {
-    display: none;
-    position: absolute;
-    font-size: 12px;
-    line-height: 14px;
-    left: 0;
-    top: -20px;
-    color: #6888;
-    white-space: nowrap;
-    /* overflow: hidden; */
-    /* text-overflow: ellipsis; */
-    background-color: #eefeff;
-    /* border: 1px solid #bbb; */
-    border-radius: 3px;
-}
-
 
 @media (max-width: 500px) {
     #prompt-input {

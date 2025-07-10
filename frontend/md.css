@@ -231,3 +231,7 @@
     content: "Copy";
     margin: auto;
 }
+.gemini-message .copy-button-OK::before{
+    content: "OK";
+    color: #007820;
+}

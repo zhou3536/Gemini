@@ -15,6 +15,8 @@ function copycode() {
                 const textToCopy = preElement.textContent;
                 // 调用复制到剪贴板函数
                 copyToClipboard(textToCopy);
+                copyButton.classList.add('copy-button-OK');
+                setTimeout(() => {copyButton.classList.remove('copy-button-OK');}, 1500);
             });
             // preElement.parentNode.insertBefore(copyButton, preElement.nextSibling);  // 在pre元素之后插入
             // preElement.appendChild(copyButton);   // 在pre元素里插入
