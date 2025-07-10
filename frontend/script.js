@@ -1,9 +1,11 @@
 function copycode() {
-    const messageElements = document.querySelectorAll('.message');
+    //移除，避免重复添加
+    const allExistingCopyButtons = document.querySelectorAll('.copy-button');
+    allExistingCopyButtons.forEach(button => { button.remove(); });
 
+    const messageElements = document.querySelectorAll('.message');
     messageElements.forEach(messageElement => {
         const preElements = messageElement.querySelectorAll('pre');
-
         preElements.forEach(preElement => {
             const copyButton = document.createElement('button');
             // copyButton.textContent = 'Copy';
@@ -14,13 +16,11 @@ function copycode() {
                 // 调用复制到剪贴板函数
                 copyToClipboard(textToCopy);
             });
-
             // preElement.parentNode.insertBefore(copyButton, preElement.nextSibling);  // 在pre元素之后插入
             // preElement.appendChild(copyButton);   // 在pre元素里插入
             preElement.parentNode.insertBefore(copyButton, preElement);  // 在pre元素之前插入
         });
     });
-
     // 复制到剪贴板的函数
     function copyToClipboard(text) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -39,21 +39,17 @@ function copycode() {
             fallbackCopyToClipboard(text);
         }
     }
-
     // Clipboard API 的 Fallback 实现
     function fallbackCopyToClipboard(text) {
         const textArea = document.createElement("textarea");
         textArea.value = text;
-
         // 避免页面滚动
         textArea.style.top = "0";
         textArea.style.left = "0";
         textArea.style.position = "fixed";
-
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-
         try {
             const successful = document.execCommand('copy');
             const msg = successful ? 'successful' : 'unsuccessful';
@@ -61,7 +57,6 @@ function copycode() {
         } catch (err) {
             console.error('Fallback: Oops, unable to copy', err);
         }
-
         document.body.removeChild(textArea);
     }
 }

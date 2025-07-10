@@ -20,6 +20,7 @@ body {
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
 }
 
 
@@ -45,7 +46,7 @@ body {
     /* -webkit-appearance: none; */
     /* -moz-appearance: none; */
     /* appearance: none; */
-    background-color: rgba(52, 53, 65, 0.08);
+    background-color: transparent;
     color: #253748;
     border-radius: 8px;
     padding: 3px 8px;
@@ -54,7 +55,7 @@ body {
     font-size: 16px;
     outline: none;
     font-weight: 600;
-    /* box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3); */
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
 }
 
 #gemini-v option {
@@ -170,13 +171,12 @@ body {
 }
 
 .user-message {
-    background-color: #dcecff;
     position: relative;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 
 .gemini-message {
-    background-color: transparent;
     position: relative;
     overflow-x: auto;
 }
@@ -208,25 +208,26 @@ body {
 
 .user-message::after,
 .gemini-message::after {
-
     position: absolute;
     left: 48px;
-    top: 16px;
-    padding: 1px 7px;
-    border-radius: 20px;
+    top: 17px;
     font-size: 16px;
-    color: #1a191b;
     font-weight: 550;
-    background-color: rgba(113, 198, 255, 0.1);
-    border: 1px solid rgba(113, 198, 255, 0.3);
+    color: transparent;
 }
 
 .user-message::after {
     content: "曼波~";
+    background: linear-gradient(to right, #c16d6f 0%, #8e374f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
 }
 
 .gemini-message::after {
     content: "Gemini";
+    background: linear-gradient(to right, #58AADD 0%, #DB5C7F 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
 }
 
 .gemini-message.loading {
