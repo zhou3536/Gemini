@@ -66,19 +66,19 @@ function copycode() {
 function wrapTablesInGeminiMessages() {
     const geminiMessages = document.querySelectorAll('div.gemini-message');
     geminiMessages.forEach(message => {
-      const tables = message.querySelectorAll('table');
-  
-      tables.forEach(table => {
-        const tableBox = document.createElement('div');
-        tableBox.classList.add('table-box');
-  
-        table.parentNode.removeChild(table);
-  
-        tableBox.appendChild(table);
-        message.appendChild(tableBox);
-      });
+        const tables = message.querySelectorAll('table');
+
+        tables.forEach(table => {
+            const tableBox = document.createElement('div');
+            tableBox.classList.add('table-box');
+
+            table.parentNode.removeChild(table);
+
+            tableBox.appendChild(table);
+            message.appendChild(tableBox);
+        });
     });
-  }
+}
 function md() {
     wrapTablesInGeminiMessages();
     copycode()
