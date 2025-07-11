@@ -64,27 +64,17 @@ function copycode() {
 }
 //给<table>套div
 function wrapTablesInGeminiMessages() {
-    // 获取所有 class 为 gemini-message 的 div 元素
     const geminiMessages = document.querySelectorAll('div.gemini-message');
-  
-    // 遍历每个 gemini-message div
     geminiMessages.forEach(message => {
-      // 获取当前 gemini-message div 内的所有 table 元素
       const tables = message.querySelectorAll('table');
   
-      // 遍历每个 table 元素
       tables.forEach(table => {
-        // 创建新的 div 元素，并设置 class 为 table-box
         const tableBox = document.createElement('div');
         tableBox.classList.add('table-box');
   
-        // 将 table 元素从原来的位置移除
         table.parentNode.removeChild(table);
   
-        // 将 table 元素添加到 table-box div 中
         tableBox.appendChild(table);
-  
-        // 将 table-box div 添加到原来的 gemini-message div 中
         message.appendChild(tableBox);
       });
     });
