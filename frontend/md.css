@@ -5,6 +5,8 @@
     --hljs-string: #718c00;
     --hljs-keyword: #8959a8;
     --hljs-function: #4271ae;
+    --tr-1: #fff;
+    --tr-2: #eee;
 }
 
 [data-theme="dark"] {
@@ -14,6 +16,8 @@
     --hljs-string: #b0c461;
     --hljs-keyword: #d5a6f4;
     --hljs-function: #88bafc;
+    --tr-1: #333;
+    --tr-2: #444;
 }
 
 
@@ -125,34 +129,46 @@
 }
 
 /* 表格样式 */
+.gemini-message .table-box {
+    overflow: hidden;
+    overflow-x: auto;
+    margin: 5px 0;
+}
+
 .gemini-message table {
     border-collapse: collapse;
     width: 100%;
-    margin: 16px 0;
-    background-color: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 5px 0;
+    /* background-color: #fff; */
+    /* border-radius: 8px; */
+    /* overflow: hidden; */
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
 }
 
 .gemini-message th,
 .gemini-message td {
-    border: 1px solid #e1e8ed;
-    padding: 4px;
+    border: 1px solid var(--df-01);
+    padding: 5px;
     text-align: left;
     min-width: 180px;
 }
 
 .gemini-message th {
-    background-color: #f8f9fa;
+    background-color: var(--tr-2);
     font-weight: 600;
     /* color: #2c3e50; */
 }
 
-.gemini-message tr:nth-child(even) {
-    background-color: #f8f9fa;
+
+/* 设置奇数行背景色 */
+.gemini-message tr:nth-child(odd) {
+    background-color: var(--tr-1); 
 }
 
+/* 设置偶数行背景色 */
+.gemini-message tr:nth-child(even) {
+    background-color: var(--tr-2); 
+}
 /* 链接样式 */
 .gemini-message a {
     color: #3498db;

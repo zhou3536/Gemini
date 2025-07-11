@@ -203,6 +203,7 @@ body {
     flex-grow: 1;
     overflow-y: auto;
     max-width: 100%;
+    /* overflow: hidden; */
 
 }
 
@@ -464,11 +465,11 @@ body {
     }
 
     ::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.2);
+        background: var(--df-02);
 
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.5);
+        background: var(--df-04);
     }
 }

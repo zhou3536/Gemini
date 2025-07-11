@@ -146,7 +146,7 @@
                     generateUserMessageIndex();
                     currentChatId = chatId;
                     // 加载成功后
-                    copycode();
+                    md();
                     localStorage.setItem('currentActiveChatId', chatId);
                 } catch (error) {
                     console.error('Error loading chat history:', error);
@@ -314,7 +314,7 @@
 
                         hljs.highlightAll();
                         fetchAndRenderHistory();
-                        copycode();
+                        md();
                         return true; // 成功
 
                     } catch (error) {
