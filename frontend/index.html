@@ -10,8 +10,8 @@
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"> -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script> -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script> -->
-     <script src="highlight.min.js"></script>
-     <script src="marked.min.js"></script>
+    <script src="highlight.min.js"></script>
+    <script src="marked.min.js"></script>
 </head>
 <style></style>
 
@@ -30,15 +30,15 @@
         <button onclick="opendhdh()">⇄</button>
     </div>
     <div class="container">
-        <ul id="history-list" class="list-1" onclick="closelist()"></ul>
+        <ul id="history-list" class="list-1"></ul>
         <ul id="list-dhdh" class="list-1"></ul>
         <main class="chat-area" id="chat-area">
-            <div id="chat-window" onclick="closelist()"></div>
+            <div id="chat-window"></div>
             <div class="input-area">
-                <textarea id="prompt-input" placeholder="输入消息..." rows="2" onclick="closelist()"></textarea>
+                <textarea id="prompt-input" placeholder="输入消息..." rows="2"></textarea>
                 <div class="send-box">
                     <div class="menu">
-                        <button id="history-b" onclick="openlist()">历史记录</button>
+                        <button id="history-b">历史记录</button>
                         <button id="new-chat-btn">新建对话</button>
                         <button id="Search" class="search" onclick="Sch()">联网搜索</button>
                         <button id="send-btn" class="send-btn"></button>
@@ -112,13 +112,15 @@
                     const response = await fetch('/api/history');
                     const histories = await response.json();
                     historyList.innerHTML = '';
+                    const Title = document.createElement('div');
                     const listTitle = document.createElement('h4');
                     listTitle.textContent = '关闭列表';
                     const DelHistory = document.createElement('a');
                     DelHistory.textContent = '管理历史';
                     DelHistory.href = 'del.html';
-                    historyList.appendChild(listTitle);
-                    historyList.appendChild(DelHistory);
+                    Title.appendChild(listTitle);
+                    Title.appendChild(DelHistory);
+                    historyList.appendChild(Title);
                     histories.forEach(h => {
                         const li = document.createElement('li');
                         li.textContent = h.title;

@@ -19,8 +19,8 @@
 }
 
 [data-theme="dark"] {
-    --bodybgc: #222;
-    --chatbgc: rgba(255, 255, 255, 0.1);
+    --bodybgc: #111;
+    --chatbgc: rgba(255, 255, 255, 0.02);
     --df-ziji: #eee;
     --df-005: rgba(255, 255, 255, 0.1);
     --df-01: rgba(255, 255, 255, 0.2);
@@ -118,7 +118,7 @@ body {
     max-width: 300px;
     height: var(--hhh);
     position: absolute;
-    border: none;
+    /* border: none; */
     z-index: 1000;
     right: 0;
     counter-reset: item-counter;
@@ -164,6 +164,7 @@ body {
     text-decoration: none;
 }
 
+.list-1 div,
 .list-1 a,
 .list-1 h4 {
     display: inline-block;
@@ -171,9 +172,13 @@ body {
     width: 50%;
     font-size: 16px;
     font-weight: 600;
+    background-color: var(--bodybgc);
+}
+
+.list-1 div {
+    width: 100%;
     position: sticky;
     top: 0;
-    background-color: var(--bodybgc);
 }
 
 .list-1 li:last-child {
@@ -183,7 +188,7 @@ body {
 .list-1 a:hover,
 .list-1 h4:hover,
 .list-1 li:hover {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: var(--df-01);
 }
 
 .list-1 li::before {
@@ -225,7 +230,7 @@ body {
 .message:last-child {
     border-bottom: none
 }
-
+.message code,
 .message p {
     margin: 5px 0;
     word-break: break-all;

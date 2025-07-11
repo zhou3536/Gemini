@@ -1,7 +1,7 @@
 :root {
     --perbgc: #f8f9fa;
     --per-df: #2c3e50;
-    --code: #6b0000;
+    --code: #002b82;
     --hljs-string: #718c00;
     --hljs-keyword: #8959a8;
     --hljs-function: #4271ae;
@@ -12,7 +12,7 @@
 [data-theme="dark"] {
     --perbgc: transition;
     --per-df: #eee;
-    --code: #ffabab;
+    --code: #abe2ff;
     --hljs-string: #b0c461;
     --hljs-keyword: #d5a6f4;
     --hljs-function: #88bafc;
@@ -85,8 +85,8 @@
 .gemini-message code {
     background-color: var(--df-005);
     color: var(--code);
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: 1px;
+    /* border-radius: 4px; */
     /* font-family: 'Monaco', 'Consolas', 'Courier New', monospace; */
     font-size: 15px;
     /* border: 1px solid #e1e8ed; */
