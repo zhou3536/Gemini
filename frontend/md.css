@@ -67,7 +67,8 @@
     padding: 16px;
     margin: 16px 0;
     overflow-x: auto;
-    font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+    /* font-family: 'Monaco', 'Consolas', 'Courier New', monospace; */
+    font-family: sans-serif;
     font-size: 14px;
     line-height: 1.4;
     position: relative;
@@ -85,9 +86,10 @@
 .gemini-message code {
     background-color: var(--df-005);
     color: var(--code);
-    padding: 1px;
+    padding: 1px 3px;
     /* border-radius: 4px; */
     /* font-family: 'Monaco', 'Consolas', 'Courier New', monospace; */
+    font-family: sans-serif;
     font-size: 15px;
     /* border: 1px solid #e1e8ed; */
     font-weight: normal;

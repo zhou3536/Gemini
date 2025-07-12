@@ -86,13 +86,21 @@ function md() {
     copycode()
 }
 //打开关闭历史列表
+let historylistdsiplay = false;
 document.addEventListener('DOMContentLoaded', function () {
     const a = document.getElementById("history-list");
     const opbtn = document.getElementById("history-b");
     opbtn.addEventListener("click", function () {
-        a.style.width = '300px';
-        a.style.borderWidth = '1px';
-        a.style.transition = 'all 0.3s ease';
+        if (!historylistdsiplay) {
+            a.style.width = '300px';
+            a.style.borderWidth = '1px';
+            a.style.transition = 'all 0.3s ease';
+            historylistdsiplay = true;
+        } else if (historylistdsiplay) {
+            a.style.width = '0';
+            a.style.borderWidth = '0';
+            historylistdsiplay = false;
+        }
     });
     document.addEventListener('click', (event) => {
         const ListOpen = a.style.width !== '0';
@@ -101,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
             a.style.width = '0';
             a.style.borderWidth = '0';
             a.style.transition = 'none';
+            historylistdsiplay = false;
         }
     });
 });
@@ -139,32 +148,6 @@ function opendhdh() {
         dhdh = true;
     }
 }
-
-//手机端键盘弹窗优化
-// document.addEventListener('DOMContentLoaded', (event) => {
-//     const promptInput = document.getElementById('prompt-input');
-//     const searchButton = document.getElementById('Search');
-//     promptInput.addEventListener('click', closelist);
-//     searchButton.addEventListener('touchstart', (e) => {
-//         e.preventDefault();
-//         Sch();
-//         setTimeout(() => { promptInput.focus(); }, 50);
-//     });
-//     searchButton.addEventListener('click', (e) => {Sch()});
-// });
-// let isPromptInputFocused = false;
-// function isPromptInput() {
-//     const promptInput = document.getElementById('prompt-input');
-//     promptInput.addEventListener('focus', () => {
-//         isPromptInputFocused = true;
-//     });
-//     promptInput.addEventListener('blur', () => {
-//         blurTimeoutId = setTimeout(() => {
-//             isPromptInputFocused = false;
-//         }, 1000);
-//     });
-// }
-// isPromptInput();
 
 //切换主题
 document.addEventListener('DOMContentLoaded', function () {

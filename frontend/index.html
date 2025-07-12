@@ -27,7 +27,10 @@
             <option value="gemini-2.5-flash">Gemini-2.5-Flash</option>
             <option value="gemini-2.5-pro">Gemini-2.5-Pro</option>
         </select>
-        <button onclick="opendhdh()">⇄</button>
+        <div class="btnbox">
+            <button class="hisbtn" id="history-b"></button>
+            <button class="dhdhbtn" onclick="opendhdh()"></button>
+        </div>
     </div>
     <div class="container">
         <ul id="history-list" class="list-1"></ul>
@@ -38,7 +41,6 @@
                 <textarea id="prompt-input" placeholder="输入消息..." rows="2"></textarea>
                 <div class="send-box">
                     <div class="menu">
-                        <button id="history-b">历史记录</button>
                         <button id="new-chat-btn">新建对话</button>
                         <button id="Search" class="search" onclick="Sch()">联网搜索</button>
                         <button id="send-btn" class="send-btn"></button>
