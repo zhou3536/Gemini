@@ -162,7 +162,7 @@ body {
     max-width: 300px;
     height: var(--hhh);
     position: absolute;
-    /* border: none; */
+    border-width: 0;
     z-index: 1000;
     right: 0;
     counter-reset: item-counter;
