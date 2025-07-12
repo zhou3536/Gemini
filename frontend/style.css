@@ -70,6 +70,7 @@ body {
 
 .btnbox button {
     /* display: block; */
+    border-radius: 5px;
     border: none;
     width: 25px;
     height: 25px;
