@@ -150,60 +150,56 @@ function opendhdh() {
 }
 
 //切换主题
-document.addEventListener('DOMContentLoaded', function () {
-    const selectElement = document.getElementById('lightdark');
+const themeToggle = {
+    themes: ['light', 'dark'],
+    currentIndex: 0,
 
-    // 函数：设置主题
-    function setTheme(theme) {
-        if (theme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark'); // 保存到 localStorage
-        } else if (theme === 'light') {
-            document.documentElement.setAttribute('data-theme', 'light');
-            localStorage.setItem('theme', 'light'); // 保存到 localStorage
+    themeinit() {
+        // 根据系统主题设置初始主题
+        const systemTheme = this.getSystemTheme();
+        this.currentIndex = this.themes.indexOf(systemTheme); // 找到系统主题在themes数组中的索引
+
+        if (this.currentIndex === -1) {
+            // 如果系统主题不在预定义的 themes 中，默认使用 light
+            this.currentIndex = 0;
+        }
+
+        this.updateTheme();
+        this.updateUI();
+
+        // 监听切换按钮
+        document.getElementById('themeToggle').addEventListener('click', () => this.toggle());
+    },
+
+    getSystemTheme() {
+        // 获取系统主题
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
         } else {
-            document.documentElement.removeAttribute('data-theme'); // 移除 data-theme 属性，使用默认颜色
-            localStorage.removeItem('theme'); // 移除 localStorage 中的 theme
+            return 'light';
         }
+    },
+
+    toggle() {
+        this.currentIndex = (this.currentIndex + 1) % this.themes.length;
+        this.updateTheme();
+        this.updateUI();
+    },
+
+    updateTheme() {
+        const theme = this.themes[this.currentIndex];
+        document.body.setAttribute('data-theme', theme);
+    },
+
+    updateUI() {
+        const theme = this.themes[this.currentIndex];
+        const icons = {
+            light: '<svg width="20" height="20" viewBox="0 0 24 24" fill="#FFDA63" stroke="#FFDA63" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+            dark: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+        };
+        document.getElementById('themeToggle').innerHTML = icons[theme];
     }
+};
 
-    // 监听选择框的 change 事件
-    selectElement.addEventListener('change', function () {
-        const selectedValue = selectElement.value;
-        setTheme(selectedValue);
-    });
-
-    // 页面加载时，从 localStorage 中读取主题设置
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-        setTheme(savedTheme);
-        selectElement.value = savedTheme; // 更新选择框的选中值
-    } else {
-        // 如果 localStorage 中没有保存的主题，则使用自动模式
-        selectElement.value = 'auto';
-    }
-
-    //自动模式判断
-    function autoTheme() {
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (prefersDark) {
-            setTheme('dark');
-            selectElement.value = 'auto';
-        } else {
-            setTheme('light');
-            selectElement.value = 'auto';
-        }
-    }
-
-    // 监听系统主题变化（仅在选择“自动”时生效）
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-        if (selectElement.value === 'auto') {
-            autoTheme();
-        }
-    });
-
-    // 初始加载时，如果是自动模式，则判断系统主题
-    if (selectElement.value === 'auto') {
-        autoTheme();
-    }
-});
+// 初始化
+themeToggle.themeinit();

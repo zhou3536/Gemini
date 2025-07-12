@@ -8,6 +8,10 @@
     --navh: 35px;
     --hhh: calc(100vh - var(--navh));
     --hhh: calc(100dvh - var(--navh));
+
+}
+
+[data-theme="light"] {
     --bodybgc: #F0F8FF;
     --chatbgc: rgba(255, 255, 255, 0.5);
     --df-ziji: #333;
@@ -27,7 +31,6 @@
     --df-02: rgba(255, 255, 255, 0.3);
     --df-03: rgba(255, 255, 255, 0.4);
     --df-04: rgba(255, 255, 255, 0.5);
-
 }
 
 body {
@@ -59,7 +62,20 @@ body {
     font-size: 22px;
     font-weight: 700;
 }
-
+#themeToggle{
+    position: absolute;
+    left: 6px;
+    display: block;
+    width: 25px;
+    height: 25px;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-content:center;
+    flex-wrap: wrap;
+    border: 1px solid var(--df-01);
+    border-radius: 5px;
+}
 .btnbox {
     display: flex;
     gap: 5px;
@@ -87,7 +103,8 @@ body {
 .hisbtn {
     background-image: url('hh.png');
 }
-.dhdhbtn{
+
+.dhdhbtn {
     display: none;
     background-image: url('dh.png');
 }
@@ -282,14 +299,13 @@ body {
     width: 35px;
     height: 35px;
     border-radius: 50%;
-    /* background-color: green; */
     position: absolute;
     left: 5px;
     top: 8px;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    outline: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .user-message::before {
@@ -473,7 +489,7 @@ body {
         border-width: 0;
     }
 
-    .dhdhbtn{
+    .dhdhbtn {
         display: block;
     }
 }

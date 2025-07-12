@@ -1,4 +1,4 @@
-:root {
+[data-theme="light"] {
     --perbgc: #f8f9fa;
     --per-df: #2c3e50;
     --code: #002b82;
@@ -19,8 +19,6 @@
     --tr-1: #333;
     --tr-2: #444;
 }
-
-
 
 /* AI回复内容的Markdown样式优化 */
 .gemini-message h1,
@@ -164,13 +162,14 @@
 
 /* 设置奇数行背景色 */
 .gemini-message tr:nth-child(odd) {
-    background-color: var(--tr-1); 
+    background-color: var(--tr-1);
 }
 
 /* 设置偶数行背景色 */
 .gemini-message tr:nth-child(even) {
-    background-color: var(--tr-2); 
+    background-color: var(--tr-2);
 }
+
 /* 链接样式 */
 .gemini-message a {
     color: #3498db;
