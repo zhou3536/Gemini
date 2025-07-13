@@ -337,5 +337,5 @@ app.delete('/api/history/:chatId', async (req, res) => {
 app.listen(port, host, () => {
     fs.mkdir(HISTORIES_DIR, { recursive: true });
     fs.mkdir(UPLOADS_DIR, { recursive: true });
-    console.log(`Server is running at http://${host}:${port}`);
+    console.log(`Server is listening on port : ${port}, Listening address : ${host}`);
 });
