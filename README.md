@@ -11,9 +11,9 @@
 #### 支持主流平台Windows，Linux，MacOS，及其他能安装node.js的平台
 ### 1，安装node.js，方法很简单，自己搜索
 ### 2，下载本仓库
-- 在backenf目录找到` .env--示例`文件，修改文件名为`.env`，打开输入你的api
+- 在backend目录找到`.env--示例`文件，修改文件名为`.env`，打开输入你的api
 ### 3，安装及运行
-- 在backenf目录下运行命令
+- 在backend目录下运行命令
 - 初始化项目
 ```
 npm init -y
