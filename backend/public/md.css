@@ -1,5 +1,5 @@
 [data-theme="light"] {
-    --perbgc: #f8f9fa;
+    --perbgc: #f6f8fa;
     --per-df: #2c3e50;
     --code: #002b82;
     --hljs-string: #718c00;
@@ -244,7 +244,7 @@
 }
 
 .gemini-message .copy-button {
-    width: 34px;
+    width: 30px;
     height: 16px;
     display: block;
     color: var(--df-ziti);
@@ -275,5 +275,5 @@
 
 .gemini-message .copy-button-OK::before {
     content: "OK";
-    color: #007820;
+    color: #36ab55;
 }
