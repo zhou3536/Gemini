@@ -8,6 +8,7 @@ import cors from 'cors';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import multer from 'multer';
 
 // --- 配置 ---
 dotenv.config();
@@ -21,6 +22,8 @@ const port = process.env.PORT || 3001;
 const host = process.env.HOST || '127.0.0.1';
 const HISTORIES_DIR = path.join(__dirname, 'histories');
 
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
+
 // Gemini AI 配置
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -28,16 +31,28 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(UPLOADS_DIR));
+
+const upload = multer({ dest: UPLOADS_DIR });
 
 // 延迟函数，用于重试
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// --- API 路由 ---
+async function fileToGenerativePart(file) {
+    const fileBuffer = await fs.readFile(file.path);
+    const base64EncodedData = fileBuffer.toString('base64');
+    return {
+        inlineData: {
+            data: base64EncodedData,
+            mimeType: file.mimetype,
+        },
+    };
+}
 
 // 核心聊天接口
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', upload.array('files'), async (req, res) => {
     let isResponseSent = false;
     let fullResponseText = '';
     let history = [];
@@ -120,10 +135,17 @@ app.post('/api/chat', async (req, res) => {
 
         const chat = model.startChat({ history });
 
-        // 只处理文本消息
         const messageParts = [];
         if (prompt) {
             messageParts.push({ text: prompt });
+        }
+
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const generativePart = await fileToGenerativePart(file);
+                messageParts.push(generativePart);
+                await fs.unlink(file.path); // Clean up the uploaded file
+            }
         }
 
         newChatId = chatId || `${Date.now()}`;
@@ -343,5 +365,6 @@ app.delete('/api/history/:chatId', async (req, res) => {
 // --- 启动服务器 ---
 app.listen(port, host, () => {
     fs.mkdir(HISTORIES_DIR, { recursive: true });
+    fs.mkdir(UPLOADS_DIR, { recursive: true });
     console.log(`Server is running at http://${host}:${port}`);
 });

@@ -34,15 +34,17 @@
         <main class="chat-area" id="chat-area">
             <div id="chat-window"></div>
             <div class="input-area">
+                <div id="file-preview-area" class="file-preview-area"></div>
                 <textarea id="prompt-input" placeholder="输入消息..." rows="2"></textarea>
+                <input type="file" id="file-input" multiple style="display: none;">
                 <div class="send-box">
                     <div class="menu">
                         <button id="new-chat-btn">新建对话</button>
+                        <button id="addfile">文件</button>
                         <button id="Search" class="search" onclick="Sch()">联网搜索</button>
                         <button id="send-btn" class="send-btn"></button>
                     </div>
                 </div>
-
             </div>
             <!-- <p style="text-align: center;padding-bottom: 3px;font-size: 13px;">内容由Google AI生成</p> -->
         </main>
@@ -56,6 +58,53 @@
             const newChatBtn = document.getElementById('new-chat-btn');
             const historyList = document.getElementById('history-list');
             const chatarea = document.getElementById('chat-area');
+            const addFileBtn = document.getElementById('addfile');
+            const fileInput = document.getElementById('file-input');
+            const filePreviewArea = document.getElementById('file-preview-area');
+
+            let selectedFiles = []; // 用于存储用户选择的文件
+
+            // --- 文件处理 ---
+            addFileBtn.addEventListener('click', () => fileInput.click());
+
+            fileInput.addEventListener('change', (event) => {
+                const files = Array.from(event.target.files);
+                files.forEach(file => {
+                    if (!selectedFiles.some(f => f.name === file.name)) {
+                        selectedFiles.push(file);
+                    }
+                });
+                renderFilePreviews();
+                fileInput.value = ''; // 清空input，以便可以再次选择同名文件
+            });
+
+            function renderFilePreviews() {
+                filePreviewArea.innerHTML = '';
+                if (selectedFiles.length > 0) {
+                    filePreviewArea.style.display = 'block';
+                } else {
+                    filePreviewArea.style.display = 'none';
+                    return;
+                }
+
+                selectedFiles.forEach((file, index) => {
+                    const preview = document.createElement('div');
+                    preview.classList.add('file-preview-item');
+                    
+                    const fileName = document.createElement('span');
+                    fileName.textContent = file.name;
+                    preview.appendChild(fileName);
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.textContent = '×';
+                    removeBtn.addEventListener('click', () => {
+                        selectedFiles.splice(index, 1);
+                        renderFilePreviews();
+                    });
+                    preview.appendChild(removeBtn);
+                    filePreviewArea.appendChild(preview);
+                });
+            }
 
             // 应用状态
             let currentChatId = null;
@@ -160,22 +209,32 @@
                 const prompt = promptInput.value.trim();
                 const modelSelect = document.getElementById('gemini-v');
                 const selectedModel = modelSelect.value;
-                if (!prompt) return;
+
+                if (!prompt && selectedFiles.length === 0) return;
 
                 sendBtn.disabled = true;
-                renderMessage('user', prompt);
+                if (prompt) {
+                    renderMessage('user', prompt);
+                }
                 promptInput.value = '';
+                filePreviewArea.style.display = 'none';
                 chatWindow.scrollTop = chatWindow.scrollHeight;
 
-                const requestBody = {
-                    prompt: prompt,
-                    model: selectedModel,
-                    searchEnabled: SearchOn
-                };
+                const formData = new FormData();
+                formData.append('prompt', prompt);
+                formData.append('model', selectedModel);
+                formData.append('searchEnabled', SearchOn);
 
                 if (currentChatId) {
-                    requestBody.chatId = currentChatId;
+                    formData.append('chatId', currentChatId);
                 }
+
+                selectedFiles.forEach(file => {
+                    formData.append('files', file);
+                });
+
+                selectedFiles = []; // 清空文件列表
+                renderFilePreviews();
 
                 const aiMessageDiv = document.createElement('div');
                 aiMessageDiv.classList.add('message', 'gemini-message', 'loading');
@@ -204,10 +263,7 @@
                     try {
                         response = await fetch('/api/chat', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(requestBody),
+                            body: formData, // 使用 FormData
                             signal: AbortSignal.timeout(120000) // 2分钟超时
                         });
 

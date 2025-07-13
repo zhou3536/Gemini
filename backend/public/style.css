@@ -518,3 +518,34 @@ body {
         background: var(--df-04);
     }
 }
+
+
+.file-preview-item{
+    display: inline-block;
+    font-size: 12px;
+    margin-right: 5px;
+    text-align: center;
+}
+.file-preview-item span{
+    padding: 0 5px;
+    border-radius: 10px;
+    background-color: var(--df-01);
+    max-width: 80px;
+    overflow: hidden;
+    display: inline-block;
+    white-space: nowrap;
+    vertical-align: middle;
+    
+}
+.file-preview-item button{
+    width: 12px;
+    height: 12px;
+    text-align: center;
+    margin-left: 1px;
+    line-height: 10px;
+    display: inline-block;
+    vertical-align: middle;
+    border: none;
+    border-radius: 20px;
+   
+}
