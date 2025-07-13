@@ -5,7 +5,7 @@
 }
 
 :root {
-    --navh: 35px;
+    --navh: 40px;
     --hhh: calc(100vh - var(--navh));
     --hhh: calc(100dvh - var(--navh));
 
@@ -47,7 +47,6 @@ body {
     margin: 0;
     height: 100vh;
     height: 100dvh;
-    overflow: hidden;
     -webkit-tap-highlight-color: transparent;
     color: var(--df-ziji);
     transition:
@@ -514,6 +513,10 @@ body {
 
 /* 滚动条 */
 @media (min-width: 600px) {
+    body {
+        overflow: hidden;
+    }
+
     ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
