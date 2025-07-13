@@ -13,7 +13,7 @@
 ### 2，下载本仓库
 - 在backenf目录找到 .env文件，输入你的api
 ### 3，安装及运行
-- 在backenf目录下运行
+- 在backenf目录下运行命令
 - 初始化项目
 ```
 npm init -y
@@ -24,7 +24,8 @@ npm install express multer @google/generative-ai dotenv cors
 ```
 node server.js
 ```
-- 到此浏览器可以打开http://你的IP:端口，就能访问了
+- 如果没报错的话
+- 浏览器可以打开http + 你的IP + 端口，就能访问了
 ### 4，其他事项
 - #### 在公网服务器强烈建议反代，加上https反代并设置访问密码
 - #### 不能访问谷歌的地区
