@@ -27,7 +27,7 @@ node server.js
 - 如果没报错的话
 - 浏览器可以打开http + 你的IP + 端口，就能访问了
 ### 4，其他事项
-- #### 在公网服务器强烈建议反代，加上https反代并设置访问密码
+- #### 在公网服务器强烈建议反代，加上https并设置访问密码
 - #### 不能访问谷歌的地区
 - 初始化项目后有一个node_modules目录，找到/@google/generative-ai/dist/index.js和index.mjs两个文件，打开文件找到这个地址`https://generativelanguage.googleapis.com`  
 替换为代理地址，可以在cloudflare worker上免费自建  
