@@ -222,7 +222,7 @@ app.post('/api/chat', upload.array('files'), async (req, res) => {
         }
 
         // 保存历史记录
-        if (fullResponseText.trim()) {
+        if (success && fullResponseText.trim()) {
             const userMessage = {
                 role: 'user',
                 parts: messageParts
@@ -278,35 +278,6 @@ app.post('/api/chat', upload.array('files'), async (req, res) => {
         safeEnd();
     }
 });
-
-// 获取最新对话
-// app.get('/api/chat/latest', async (req, res) => {
-//     try {
-//         const files = await fs.readdir(HISTORIES_DIR);
-//         const jsonFiles = files
-//             .filter(file => file.endsWith('.json'))
-//             .sort()
-//             .reverse();
-
-//         if (jsonFiles.length === 0) {
-//             return res.json({ chatId: null, messages: [] });
-//         }
-
-//         const latestFile = jsonFiles[0];
-//         const chatId = latestFile.replace('.json', '');
-//         const filePath = path.join(HISTORIES_DIR, latestFile);
-//         const data = await fs.readFile(filePath, 'utf-8');
-//         const messages = JSON.parse(data);
-//         res.json({ chatId, messages });
-
-//     } catch (error) {
-//         if (error.code === 'ENOENT') {
-//             return res.json({ chatId: null, messages: [] });
-//         }
-//         console.error('Error fetching latest chat:', error);
-//         res.status(500).json({ error: 'Failed to retrieve the latest chat.' });
-//     }
-// });
 
 // 获取历史列表
 app.get('/api/history', async (req, res) => {
