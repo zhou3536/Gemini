@@ -37,7 +37,7 @@ body {
     font-family: sans-serif;
     margin: 0;
     /* background: linear-gradient(to bottom, #F4F8FB 0%, #FBF8F4 100%); */
-    max-width: 100vw;
+    /* max-width: 100vw; */
     background: var(--bodybgc);
     margin: 0;
     height: 100vh;
@@ -48,8 +48,8 @@ body {
     transition:
         background-color 0.3s ease-in-out,
         color 0.3s ease-in-out;
+    min-width: 320px;
 }
-
 
 .nav {
     height: var(--navh);
@@ -61,6 +61,7 @@ body {
     background: linear-gradient(to right, #58AADD 0%, #DB5C7F 100%);
     font-size: 22px;
     font-weight: 700;
+    position: relative;
 }
 
 #themeToggle {
@@ -74,7 +75,7 @@ body {
     justify-content: center;
     align-content: center;
     flex-wrap: wrap;
-    border: 1px solid var(--df-01);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 5px;
 }
 
@@ -93,12 +94,12 @@ body {
     width: 25px;
     height: 25px;
     background-size: cover;
-    /* background-repeat: no-repeat; */
+    background-color: rgba(255, 255, 255, 0.8);
     background-position: center;
 }
 
 .btnbox button:active {
-    background-color: var(--df-01);
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 .hisbtn {
@@ -244,7 +245,8 @@ body {
 
 .chat-area {
     background-color: var(--chatbgc);
-    width: 100vw;
+    width: 100%;
+    max-width: 800px;
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -261,7 +263,6 @@ body {
     overflow-y: auto;
     max-width: 100%;
     /* overflow: hidden; */
-
 }
 
 .message {
@@ -333,7 +334,7 @@ body {
 }
 
 .user-message::after {
-    content: "User-曼波";
+    content: "User";
     background: linear-gradient(to right, #c16d6f 0%, #8e374f 100%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -485,11 +486,7 @@ body {
     }
 }
 
-@media (max-width: 1000px) {
-    .nav {
-        position: relative;
-    }
-
+@media (max-width: 1220px) {
     #list-dhdh {
         width: 0;
         border-width: 0;
@@ -502,13 +499,7 @@ body {
 
 
 /* 滚动条 */
-@media (min-width: 1000px) {
-    .chat-area {
-        max-width: 800px;
-        max-width: min(calc(100% - 416px), 800px);
-    }
-
-
+@media (min-width: 600px) {
     ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
