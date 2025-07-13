@@ -13,8 +13,6 @@
     <script src="highlight.min.js"></script>
     <script src="marked.min.js"></script>
 </head>
-<style></style>
-
 <body>
     <div class="nav">
         <button class="theme-toggle" id="themeToggle"></button>
@@ -122,19 +120,28 @@
                 });
             }
 
-            function renderMessage(sender, text, targetDiv = null) {
+            function renderMessage(sender, text, fileCount = 0, targetDiv = null) {
                 const messageDiv = targetDiv || document.createElement('div');
                 if (!targetDiv) {
                     messageDiv.classList.add('message', `${sender}-message`);
                 }
+
                 if (sender === 'gemini' && typeof marked !== 'undefined') {
                     messageDiv.innerHTML = marked.parse(text);
                 } else {
                     const p = document.createElement('p');
                     p.textContent = text;
-                    messageDiv.innerHTML = '';
+                    messageDiv.innerHTML = ''; // 清空现有内容
                     messageDiv.appendChild(p);
                 }
+
+                if (sender === 'user' && fileCount > 0) {
+                    const fileInfo = document.createElement('div');
+                    fileInfo.classList.add('file-info');
+                    fileInfo.textContent = `+${fileCount} 个文件`;
+                    messageDiv.appendChild(fileInfo);
+                }
+
                 if (!targetDiv) {
                     chatWindow.appendChild(messageDiv);
                 }
@@ -149,8 +156,10 @@
                     return;
                 }
                 messages.forEach(msg => {
-                    const text = msg.parts.find(p => p.text)?.text || '';
-                    renderMessage(msg.role === 'user' ? 'user' : 'gemini', text);
+                    const textPart = msg.parts.find(p => p.text);
+                    const text = textPart ? textPart.text : '';
+                    const fileCount = msg.parts.length - (textPart ? 1 : 0);
+                    renderMessage(msg.role === 'user' ? 'user' : 'gemini', text, fileCount);
                 });
             }
 
@@ -213,11 +222,9 @@
                 if (!prompt && selectedFiles.length === 0) return;
 
                 sendBtn.disabled = true;
-                if (prompt) {
-                    renderMessage('user', prompt);
+                if (prompt || selectedFiles.length > 0) {
+                    renderMessage('user', prompt, selectedFiles.length);
                 }
-                promptInput.value = '';
-                filePreviewArea.style.display = 'none';
                 chatWindow.scrollTop = chatWindow.scrollHeight;
 
                 const formData = new FormData();
@@ -232,9 +239,6 @@
                 selectedFiles.forEach(file => {
                     formData.append('files', file);
                 });
-
-                selectedFiles = []; // 清空文件列表
-                renderFilePreviews();
 
                 const aiMessageDiv = document.createElement('div');
                 aiMessageDiv.classList.add('message', 'gemini-message', 'loading');
@@ -271,6 +275,11 @@
                             const errData = await response.json();
                             throw new Error(errData.error || 'Network response was not ok');
                         }
+
+                        // 后端已收到请求，现在清空输入
+                        promptInput.value = '';
+                        selectedFiles = [];
+                        renderFilePreviews();
 
                         reader = response.body.getReader();
                         const decoder = new TextDecoder();
