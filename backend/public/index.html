@@ -13,6 +13,7 @@
     <script src="highlight.min.js"></script>
     <script src="marked.min.js"></script>
 </head>
+
 <body>
     <div class="nav">
         <button class="theme-toggle" id="themeToggle"></button>
@@ -88,7 +89,7 @@
                 selectedFiles.forEach((file, index) => {
                     const preview = document.createElement('div');
                     preview.classList.add('file-preview-item');
-                    
+
                     const fileName = document.createElement('span');
                     fileName.textContent = file.name;
                     preview.appendChild(fileName);
@@ -481,6 +482,9 @@
                 const userMessages = document.querySelectorAll('#chat-window .message.user-message');
                 indexList.innerHTML = '';
                 if (userMessages.length === 0) {
+                    const listTitle = document.createElement('h4');
+                    listTitle.textContent = '你没有发送信息';
+                    indexList.appendChild(listTitle);
                     return;
                 }
                 const listTitle = document.createElement('h4');

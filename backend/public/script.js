@@ -1,14 +1,14 @@
 function copycode() {
     //移除，避免重复添加
-    const allExistingCopyButtons = document.querySelectorAll('.copy-button');
-    allExistingCopyButtons.forEach(button => { button.remove(); });
+    // const allExistingCopyButtons = document.querySelectorAll('.copy-button');
+    // allExistingCopyButtons.forEach(button => { button.remove(); });
 
     const messageElements = document.querySelectorAll('.message');
     messageElements.forEach(messageElement => {
         const preElements = messageElement.querySelectorAll('pre');
         preElements.forEach(preElement => {
+            if (preElement.dataset.wrapped) { return; };
             const copyButton = document.createElement('button');
-            // copyButton.textContent = 'Copy';
             copyButton.classList.add('copy-button');
             copyButton.addEventListener('click', () => {
                 // 获取pre元素内的所有文本，去除 HTML 标签
@@ -18,9 +18,8 @@ function copycode() {
                 copyButton.classList.add('copy-button-OK');
                 setTimeout(() => { copyButton.classList.remove('copy-button-OK'); }, 1500);
             });
-            // preElement.parentNode.insertBefore(copyButton, preElement.nextSibling);  // 在pre元素之后插入
-            // preElement.appendChild(copyButton);   // 在pre元素里插入
             preElement.parentNode.insertBefore(copyButton, preElement);  // 在pre元素之前插入
+            preElement.dataset.wrapped = 'true';
         });
     });
     // 复制到剪贴板的函数
@@ -70,9 +69,7 @@ function wrapTablesInGeminiMessages() {
         const tables = message.querySelectorAll('table');
 
         tables.forEach(table => {
-            if (table.dataset.wrapped) {
-                return;
-            }
+            if (table.dataset.wrapped) { return; }
             const tableBox = document.createElement('div');
             tableBox.classList.add('table-box');
             table.parentNode.replaceChild(tableBox, table);
