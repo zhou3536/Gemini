@@ -7,9 +7,6 @@
     <title>MyGemini</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="md.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script> -->
     <script src="highlight.min.js"></script>
     <script src="marked.min.js"></script>
 </head>
@@ -195,7 +192,6 @@
                 if (!chatId) return;
                 try {
                     const response = await fetch(`/api/history/${chatId}`);
-                    // 如果因为缓存的ID在服务端已被删除而找不到，则应回退到新会话
                     if (!response.ok) {
                         throw new Error(`Chat with ID ${chatId} not found.`);
                     }
@@ -203,17 +199,16 @@
                     renderChatHistory(messages);
                     generateUserMessageIndex();
                     currentChatId = chatId;
-                    // 加载成功后
                     md();
                     localStorage.setItem('currentActiveChatId', chatId);
                 } catch (error) {
                     console.error('Error loading chat history:', error);
-                    // **关键修改：如果加载失败（比如ID不存在了），清除缓存并打开新会话**
                     localStorage.removeItem('currentActiveChatId');
-                    newChatBtn.click(); // 模拟点击新建对话按钮，重置界面
+                    newChatBtn.click();
                 }
             }
-            //发送信息
+
+            // 发送信息
             async function sendMessage() {
                 const prompt = promptInput.value.trim();
                 const modelSelect = document.getElementById('gemini-v');
@@ -222,9 +217,7 @@
                 if (!prompt && selectedFiles.length === 0) return;
 
                 sendBtn.disabled = true;
-                if (prompt || selectedFiles.length > 0) {
-                    renderMessage('user', prompt, selectedFiles.length);
-                }
+                renderMessage('user', prompt, selectedFiles.length);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
 
                 const formData = new FormData();
@@ -244,21 +237,15 @@
                 aiMessageDiv.classList.add('message', 'gemini-message', 'loading');
                 chatWindow.appendChild(aiMessageDiv);
 
-                const think = document.createElement('i');
-                think.innerText = '正在思考...';
-                const search = document.createElement('i');
-                search.innerText = '正在搜索互联网...';
-                if (SearchOn) {
-                    aiMessageDiv.appendChild(search);
-                } else {
-                    aiMessageDiv.appendChild(think);
-                }
-
+                const requestingIndicator = document.createElement('i');
+                requestingIndicator.innerText = '正在请求...';
+                aiMessageDiv.appendChild(requestingIndicator);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
 
                 let accumulatedText = '';
                 let retryCount = 0;
                 const maxRetries = 3;
+                let customError = null; // 用于存储不可重试的错误
 
                 const attemptRequest = async () => {
                     let reader = null;
@@ -267,19 +254,14 @@
                     try {
                         response = await fetch('/api/chat', {
                             method: 'POST',
-                            body: formData, // 使用 FormData
-                            signal: AbortSignal.timeout(120000) // 2分钟超时
+                            body: formData,
+                            signal: AbortSignal.timeout(120000)
                         });
 
                         if (!response.ok) {
-                            const errData = await response.json();
-                            throw new Error(errData.error || 'Network response was not ok');
+                            const errData = await response.json().catch(() => ({}));
+                            throw new Error(errData.error || `Network response was not ok, status: ${response.status}`);
                         }
-
-                        // 后端已收到请求，现在清空输入
-                        promptInput.value = '';
-                        selectedFiles = [];
-                        renderFilePreviews();
 
                         reader = response.body.getReader();
                         const decoder = new TextDecoder();
@@ -291,10 +273,7 @@
                             const { value, done } = await reader.read();
 
                             if (done) {
-                                if (!isCompleted) {
-                                    console.log('Stream ended unexpectedly');
-                                    throw new Error('Stream ended unexpectedly');
-                                }
+                                if (!isCompleted) throw new Error('Stream ended unexpectedly');
                                 break;
                             }
 
@@ -310,10 +289,28 @@
                                         const data = JSON.parse(dataString);
 
                                         if (data.error) {
-                                            throw new Error(data.error);
+                                            const error = new Error(data.error);
+                                            if (data.canRetry === false) {
+                                                customError = error; // 标记为不可重试错误
+                                            }
+                                            throw error;
                                         }
 
-                                        // 处理重试通知
+                                        if (data.status === 'THINKING') {
+                                            const thinkingIndicator = document.createElement('i');
+                                            thinkingIndicator.innerText = SearchOn ? '正在搜索互联网...' : '正在思考...';
+                                            aiMessageDiv.innerHTML = '';
+                                            aiMessageDiv.appendChild(thinkingIndicator);
+                                            promptInput.value = '';
+                                            selectedFiles = [];
+                                            renderFilePreviews();
+                                            if (!currentChatId && data.chatId) {
+                                                currentChatId = data.chatId;
+                                                localStorage.setItem('currentActiveChatId', currentChatId);
+                                            }
+                                            continue;
+                                        }
+
                                         if (data.retry) {
                                             const retryInfo = document.createElement('i');
                                             retryInfo.innerText = `连接中断，正在重试... (${data.attempt}/${data.maxRetries})`;
@@ -323,56 +320,39 @@
                                             continue;
                                         }
 
-                                        // 处理完成信号
                                         if (data.completed) {
                                             isCompleted = true;
-                                            console.log(`Response completed. Total length: ${data.totalLength}`);
                                             continue;
                                         }
 
-                                        // 处理警告信息
                                         if (data.warning) {
                                             console.warn('Server warning:', data.warning);
                                             continue;
                                         }
 
-                                        // 处理正常响应
                                         if (data.reply) {
-                                            const threshold = 10;
-                                            const isAtBottom = chatWindow.scrollHeight - chatWindow.scrollTop - chatWindow.clientHeight <= threshold;
-
-                                            // 更新聊天ID
-                                            if (!currentChatId && data.chatId) {
-                                                currentChatId = data.chatId;
-                                                localStorage.setItem('currentActiveChatId', currentChatId);
+                                            if (accumulatedText === '') {
+                                                aiMessageDiv.innerHTML = '';
                                             }
-
                                             accumulatedText += data.reply;
                                             aiMessageDiv.innerHTML = marked.parse(accumulatedText);
-
-                                            // 滚动逻辑
-                                            const messageRect = aiMessageDiv.getBoundingClientRect();
-                                            const containerRect = chatWindow.getBoundingClientRect();
-                                            const messageAtTop = messageRect.top <= containerRect.top + 150;
-
-                                            if (isAtBottom && !messageAtTop) {
+                                            const threshold = 10;
+                                            const isAtBottom = chatWindow.scrollHeight - chatWindow.scrollTop - chatWindow.clientHeight <= threshold;
+                                            if (isAtBottom) {
                                                 chatWindow.scrollTop = chatWindow.scrollHeight;
                                             }
                                         }
                                     } catch (parseError) {
                                         console.error('Error parsing stream data:', parseError);
-                                        // 继续处理其他数据块，不中断整个流
                                     }
                                 }
                             }
 
-                            // 检查是否长时间没有数据
-                            if (Date.now() - lastActivityTime > 30000) { // 30秒没有数据
+                            if (Date.now() - lastActivityTime > 30000) {
                                 throw new Error('Stream timeout - no data received for 30 seconds');
                             }
                         }
 
-                        // 如果到这里没有任何内容，说明可能有问题
                         if (accumulatedText.trim() === '') {
                             throw new Error('No content received from server');
                         }
@@ -380,38 +360,31 @@
                         hljs.highlightAll();
                         fetchAndRenderHistory();
                         md();
-                        return true; // 成功
 
                     } catch (error) {
                         console.error(`Request attempt ${retryCount + 1} failed:`, error);
 
-                        // 清理资源
                         if (reader) {
-                            try {
-                                reader.cancel();
-                            } catch (e) {
-                                console.error('Error canceling reader:', e);
-                            }
+                            try { reader.cancel(); } catch (e) { console.error('Error canceling reader:', e); }
                         }
 
-                        // 检查是否应该重试
-                        if (retryCount < maxRetries - 1 &&
-                            !error.message?.includes('quota') &&
-                            !error.message?.includes('Authentication')) {
+                        // 如果是自定义的不可重试错误，直接抛出
+                        if (customError) {
+                            throw customError;
+                        }
 
+                        if (retryCount < maxRetries - 1) {
                             retryCount++;
-                            const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 5000); // 指数退避，最大5秒
-
+                            const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 5000);
                             const retryInfo = document.createElement('i');
                             retryInfo.innerText = `连接失败，${retryDelay / 1000}秒后重试... (${retryCount}/${maxRetries})`;
                             retryInfo.style.color = '#ff6b6b';
                             aiMessageDiv.innerHTML = '';
                             aiMessageDiv.appendChild(retryInfo);
-
                             await new Promise(resolve => setTimeout(resolve, retryDelay));
-                            return attemptRequest(); // 递归重试
+                            return attemptRequest();
                         } else {
-                            throw error; // 重试次数用完或不可重试的错误
+                            throw error;
                         }
                     }
                 };
@@ -419,36 +392,19 @@
                 try {
                     await attemptRequest();
                 } catch (error) {
-                    console.error('All retry attempts failed:', error);
-
-                    let errorMessage = '抱歉，出现错误：';
-                    if (error.message?.includes('timeout')) {
-                        errorMessage += '请求超时，请检查网络连接后重试';
-                    } else if (error.message?.includes('quota')) {
-                        errorMessage += 'API 配额不足，请稍后重试';
-                    } else if (error.message?.includes('Network')) {
-                        errorMessage += '网络连接问题，请检查网络后重试';
-                    } else if (error.message?.includes('parse stream')) {
-                        errorMessage += '数据流解析失败，请重试';
-                    } else {
-                        errorMessage += error.message || '未知错误';
-                    }
-
-                    // 显示错误信息
+                    console.error('All retry attempts failed or non-retryable error:', error);
                     const errorDiv = document.createElement('div');
                     errorDiv.style.color = '#ff6b6b';
                     const errorText = document.createElement('p');
-                    errorText.textContent = errorMessage;
+                    errorText.textContent = `抱歉，出现错误：${error.message || '未知错误'}`;
                     errorText.style.margin = '0 0 10px 0';
                     errorDiv.appendChild(errorText);
                     aiMessageDiv.innerHTML = '';
                     aiMessageDiv.appendChild(errorDiv);
-
                 } finally {
                     aiMessageDiv.classList.remove('loading');
                     sendBtn.disabled = false;
                     generateUserMessageIndex();
-
                     const threshold = 10;
                     const isAtBottom = chatWindow.scrollHeight - chatWindow.scrollTop - chatWindow.clientHeight <= threshold;
                     if (isAtBottom) {
@@ -471,7 +427,7 @@
                 localStorage.removeItem('currentActiveChatId');
                 currentChatId = null;
                 chatWindow.innerHTML = '';
-                renderChatHistory([]); // 清空并显示欢迎语
+                renderChatHistory([]);
                 generateUserMessageIndex();
             });
 
@@ -511,10 +467,7 @@
 
             // --- 初始化
             async function initializeApp() {
-                // 1. 总是获取并渲染历史列表
                 await fetchAndRenderHistory();
-
-                // 2. 检查localStorage中是否有缓存的对话ID
                 const cachedChatId = localStorage.getItem('currentActiveChatId');
                 if (cachedChatId) {
                     await loadChatHistory(cachedChatId);
