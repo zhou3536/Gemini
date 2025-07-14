@@ -22,7 +22,6 @@
     --df-02: rgba(0, 0, 0, 0.2);
     --df-03: rgba(0, 0, 0, 0.3);
     --df-04: rgba(0, 0, 0, 0.4);
-    --addfile: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.125 20.6155H5.875C5.39175 20.6155 5 20.2298 5 19.754V4.2463C5 3.77049 5.39175 3.38477 5.875 3.38477H14.625L19 7.69246V19.754C19 20.2298 18.6083 20.6155 18.125 20.6155Z' stroke='%23555' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M15.2311 11.9931L12.0003 8.76953L8.76953 12.0003' stroke='%23555' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12.001 8.76953V16.308' stroke='%23555' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 [data-theme="dark"] {
@@ -35,7 +34,6 @@
     --df-02: rgba(255, 255, 255, 0.3);
     --df-03: rgba(255, 255, 255, 0.4);
     --df-04: rgba(255, 255, 255, 0.5);
-    --addfile: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.125 20.6155H5.875C5.39175 20.6155 5 20.2298 5 19.754V4.2463C5 3.77049 5.39175 3.38477 5.875 3.38477H14.625L19 7.69246V19.754C19 20.2298 18.6083 20.6155 18.125 20.6155Z' stroke='%23bbb' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M15.2311 11.9931L12.0003 8.76953L8.76953 12.0003' stroke='%23bbb' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12.001 8.76953V16.308' stroke='%23bbb' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 body {
@@ -455,18 +453,18 @@ body {
 }
 
 .menu button:nth-child(1):active {
-    border: 1px solid rgba(30, 173, 255);
+    border: 1px solid #1eadff;
     background-color: rgba(30, 173, 255, 0.2);
 }
 
 #addfile {
-    background-image: var(--addfile);
+    background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18.125 20.6155H5.875C5.39175 20.6155 5 20.2298 5 19.754V4.2463C5 3.77049 5.39175 3.38477 5.875 3.38477H14.625L19 7.69246V19.754C19 20.2298 18.6083 20.6155 18.125 20.6155Z' stroke='%2369b5e1' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M15.2311 11.9931L12.0003 8.76953L8.76953 12.0003' stroke='%2369b5e1' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12.001 8.76953V16.308' stroke='%2369b5e1' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     border: none;
     background-repeat: no-repeat;
     background-position: center;
     /* background-size: cover; */
-    width: 25px;
-    height: 25px;
+    width: 24px;
+    height: 24px;
 }
 
 .menu .search {
