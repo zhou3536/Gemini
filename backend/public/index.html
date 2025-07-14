@@ -61,14 +61,25 @@
 
             // --- 文件处理 ---
             addFileBtn.addEventListener('click', () => fileInput.click());
-
             fileInput.addEventListener('change', (event) => {
                 const files = Array.from(event.target.files);
+                const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+                let largeFilesDetected = false;
+
                 files.forEach(file => {
-                    if (!selectedFiles.some(f => f.name === file.name)) {
-                        selectedFiles.push(file);
+                    if (file.size > MAX_FILE_SIZE_BYTES) {
+                        largeFilesDetected = true;
+                        console.warn(`文件 "${file.name}" (大小: ${file.size} 字节) 超过了 5MB 的限制，将被忽略。`);
+                    } else {
+                        // 检查是否已存在同名文件，避免重复添加
+                        if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                            selectedFiles.push(file);
+                        }
                     }
                 });
+
+                if (largeFilesDetected) { alert('请选择小于5MB的文件'); }
+
                 renderFilePreviews();
                 fileInput.value = ''; // 清空input，以便可以再次选择同名文件
             });
@@ -239,7 +250,7 @@
                 chatWindow.appendChild(aiMessageDiv);
 
                 const requestingIndicator = document.createElement('i');
-                requestingIndicator.innerText = '正在请求...';
+                requestingIndicator.innerText = '发送中...';
                 aiMessageDiv.appendChild(requestingIndicator);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
 
@@ -316,7 +327,7 @@
                                             const retryInfo = document.createElement('i');
                                             retryInfo.innerText = `连接中断，正在重试... (${data.attempt}/${data.maxRetries})`;
                                             retryInfo.style.color = '#ff6b6b';
-                                            aiMessageDiv.innerHTML = '';
+                                            // aiMessageDiv.innerHTML = '';
                                             aiMessageDiv.appendChild(retryInfo);
                                             continue;
                                         }
@@ -386,7 +397,7 @@
                             const retryInfo = document.createElement('i');
                             retryInfo.innerText = `连接失败，${retryDelay / 1000}秒后重试... (${retryCount}/${maxRetries})`;
                             retryInfo.style.color = '#ff6b6b';
-                            aiMessageDiv.innerHTML = '';
+                            // aiMessageDiv.innerHTML = '';
                             aiMessageDiv.appendChild(retryInfo);
                             await new Promise(resolve => setTimeout(resolve, retryDelay));
                             return attemptRequest();
