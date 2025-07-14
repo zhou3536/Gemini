@@ -20,8 +20,8 @@
             <option value="gemini-2.5-pro">Gemini-2.5-Pro</option>
         </select>
         <div class="btnbox">
-            <button class="hisbtn" id="history-b"></button>
             <button class="dhdhbtn" onclick="opendhdh()"></button>
+            <button class="hisbtn" id="history-b"></button>
         </div>
     </div>
     <div class="container">
@@ -340,7 +340,7 @@
                                             const messageRect = aiMessageDiv.getBoundingClientRect();
                                             const containerRect = chatWindow.getBoundingClientRect();
                                             const messageAtTop = messageRect.top <= containerRect.top + 150;
-                                           
+
                                             //不要删除
                                             // const threshold = 10;
                                             // const isAtBottom = chatWindow.scrollHeight - chatWindow.scrollTop - chatWindow.clientHeight <= threshold;
@@ -440,7 +440,7 @@
                 indexList.innerHTML = '';
                 if (userMessages.length === 0) {
                     const listTitle = document.createElement('h4');
-                    listTitle.textContent = '你没有发送消息';
+                    listTitle.textContent = '开始对话把！';
                     indexList.appendChild(listTitle);
                     return;
                 }
