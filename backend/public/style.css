@@ -377,7 +377,8 @@ body {
     }
 }
 
-.gemini-message i {
+.gemini-message>i {
+    display: block;
     animation: fade 2s infinite;
 }
 
@@ -566,5 +567,5 @@ body {
 }
 button:disabled {
     cursor: not-allowed !important;
-    opacity: 0.5;
+    opacity: 0.3;
 }
