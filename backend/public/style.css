@@ -564,3 +564,7 @@ body {
     border-radius: 20px;
 
 }
+button:disabled {
+    cursor: not-allowed !important;
+    opacity: 0.5;
+}
