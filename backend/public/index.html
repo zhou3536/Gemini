@@ -218,6 +218,7 @@
 
                 sendBtn.disabled = true;
                 renderMessage('user', prompt, selectedFiles.length);
+
                 chatWindow.scrollTop = chatWindow.scrollHeight;
 
                 const formData = new FormData();
@@ -245,7 +246,7 @@
                 let accumulatedText = '';
                 let retryCount = 0;
                 const maxRetries = 3;
-                let customError = null; // 用于存储不可重试的错误
+                let customError = null;
 
                 const attemptRequest = async () => {
                     let reader = null;
@@ -291,7 +292,7 @@
                                         if (data.error) {
                                             const error = new Error(data.error);
                                             if (data.canRetry === false) {
-                                                customError = error; // 标记为不可重试错误
+                                                customError = error;
                                             }
                                             throw error;
                                         }
@@ -335,12 +336,19 @@
                                                 aiMessageDiv.innerHTML = '';
                                             }
                                             accumulatedText += data.reply;
+
+                                            const messageRect = aiMessageDiv.getBoundingClientRect();
+                                            const containerRect = chatWindow.getBoundingClientRect();
+                                            const messageAtTop = messageRect.top <= containerRect.top + 150;
+                                           
+                                            //不要删除
+                                            // const threshold = 10;
+                                            // const isAtBottom = chatWindow.scrollHeight - chatWindow.scrollTop - chatWindow.clientHeight <= threshold;
+
                                             aiMessageDiv.innerHTML = marked.parse(accumulatedText);
-                                            const threshold = 10;
-                                            const isAtBottom = chatWindow.scrollHeight - chatWindow.scrollTop - chatWindow.clientHeight <= threshold;
-                                            if (isAtBottom) {
-                                                chatWindow.scrollTop = chatWindow.scrollHeight;
-                                            }
+
+                                            // 滚动
+                                            if (!messageAtTop) { chatWindow.scrollTop = chatWindow.scrollHeight; };
                                         }
                                     } catch (parseError) {
                                         console.error('Error parsing stream data:', parseError);
@@ -368,7 +376,6 @@
                             try { reader.cancel(); } catch (e) { console.error('Error canceling reader:', e); }
                         }
 
-                        // 如果是自定义的不可重试错误，直接抛出
                         if (customError) {
                             throw customError;
                         }
@@ -405,11 +412,6 @@
                     aiMessageDiv.classList.remove('loading');
                     sendBtn.disabled = false;
                     generateUserMessageIndex();
-                    const threshold = 10;
-                    const isAtBottom = chatWindow.scrollHeight - chatWindow.scrollTop - chatWindow.clientHeight <= threshold;
-                    if (isAtBottom) {
-                        chatWindow.scrollTop = chatWindow.scrollHeight;
-                    }
                 }
             }
 
