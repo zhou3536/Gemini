@@ -1,6 +1,5 @@
-// backend/server.js
 console.log('Service is trying to start...');
-// --- 模块导入 (统一使用 ES Modules) ---
+
 import express from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
@@ -9,6 +8,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
+import { EventEmitter } from 'events';
+import { v4 as uuidv4 } from 'uuid';
 
 // --- 配置 ---
 dotenv.config();
@@ -21,11 +22,15 @@ const app = express();
 const port = process.env.PORT || 3001;
 const host = process.env.HOST || '127.0.0.1';
 const HISTORIES_DIR = path.join(__dirname, 'histories');
-
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 // Gemini AI 配置
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// --- 任务管理 ---
+const jobs = new Map();
+const chatEvents = new EventEmitter();
+chatEvents.setMaxListeners(0); // 无限监听器以避免警告
 
 // --- 中间件 ---
 app.use(cors());
@@ -47,7 +52,6 @@ function isNonRetryableError(error) {
     return nonRetryableKeywords.some(keyword => errorMessage.includes(keyword));
 }
 
-
 async function fileToGenerativePart(file) {
     const fileBuffer = await fs.readFile(file.path);
     const base64EncodedData = fileBuffer.toString('base64');
@@ -59,261 +63,213 @@ async function fileToGenerativePart(file) {
     };
 }
 
-// 核心聊天接口
+// 核心聊天接口 - 步骤1: 接收请求，创建任务
 app.post('/api/chat', upload.array('files'), async (req, res) => {
-    let isResponseSent = false;
-    let fullResponseText = '';
-    let history = [];
-    let newChatId = null;
-
-    // 设置响应头
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-
-    // 安全发送响应的函数
-    const safeSend = (data) => {
-        if (!isResponseSent && !res.destroyed) {
-            try {
-                res.write(`data: ${JSON.stringify(data)}\n\n`);
-                return true;
-            } catch (error) {
-                console.error('Error writing to response:', error);
-                return false;
-            }
-        }
-        return false;
-    };
-
-    // 安全结束响应的函数
-    const safeEnd = () => {
-        if (!isResponseSent && !res.destroyed) {
-            try {
-                res.end();
-                isResponseSent = true;
-            } catch (error) {
-                console.error('Error ending response:', error);
-            }
-        }
-    };
-
-    // 处理客户端断开连接
-    res.on('close', () => {
-        isResponseSent = true;
-        console.log('Client disconnected');
-    });
-
     try {
-        const { prompt, chatId, searchEnabled } = req.body;
-        const modelName = req.body.model;
+        const { prompt, chatId, searchEnabled, model: modelName } = req.body;
+        const isSearchEnabled = searchEnabled === 'true';
+        const jobId = uuidv4();
+        const newChatId = chatId || `${Date.now()}`;
 
-        // 将字符串转换为布尔值
-        const isSearchEnabled = searchEnabled === true || searchEnabled === 'true';
+        console.log(`Job ${jobId} created for chat: ${newChatId}, Model: ${modelName}, Search: ${isSearchEnabled}`);
 
-        console.log(`Using model: ${modelName} for chat: ${chatId || 'New Chat'}, Search: ${isSearchEnabled}`);
-
-        // 根据搜索状态配置模型
-        const modelConfig = {
-            model: modelName,
-            generationConfig: {
-                temperature: 0.7,
-                topP: 0.8,
-                topK: 40,
-                maxOutputTokens: 8192,
-            }
-        };
-
-        // 如果启用搜索，添加搜索工具
-        if (isSearchEnabled) {
-            modelConfig.tools = [{ google_search: {} }];
-        }
-
-        const model = genAI.getGenerativeModel(modelConfig);
-
-        // 加载历史记录
+        let history = [];
         if (chatId) {
             try {
                 const historyPath = path.join(HISTORIES_DIR, `${chatId}.json`);
-                const data = await fs.readFile(historyPath, 'utf-8');
-                history = JSON.parse(data);
+                history = JSON.parse(await fs.readFile(historyPath, 'utf-8'));
             } catch (e) {
-                console.log(`History for ${chatId} not found. Starting a new chat.`);
+                console.log(`History for ${chatId} not found. Starting new chat.`);
             }
         }
 
-        const chat = model.startChat({ history });
-
         const messageParts = [];
-        if (prompt) {
-            messageParts.push({ text: prompt });
-        }
+        if (prompt) messageParts.push({ text: prompt });
 
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {
-                const generativePart = await fileToGenerativePart(file);
-                messageParts.push(generativePart);
-                await fs.unlink(file.path); // Clean up the uploaded file
+                messageParts.push(await fileToGenerativePart(file));
+                await fs.unlink(file.path); // 清理上传的文件
             }
         }
 
-        newChatId = chatId || `${Date.now()}`;
-
-        // 立即发送"思考中"信号，让前端可以更新UI
-        if (!safeSend({ status: 'THINKING', chatId: newChatId })) {
-            return safeEnd();
-        }
-
-        // 将实际的、耗时的Gemini调用放在一个异步函数中
-        const executeChat = async () => {
-            // 重试机制的流式响应处理
-            let maxRetries = 3;
-            let currentRetry = 0;
-            let success = false;
-
-            while (currentRetry < maxRetries && !success && !isResponseSent) {
-                try {
-                    console.log(`Attempting to send message (attempt ${currentRetry + 1}/${maxRetries})`);
-
-                    // 在每次重试前重置 fullResponseText
-                    if (currentRetry > 0) {
-                        fullResponseText = '';
-                    }
-
-                    const result = await chat.sendMessageStream(messageParts);
-
-                    let chunkCount = 0;
-                    const startTime = Date.now();
-
-                    for await (const chunk of result.stream) {
-                        if (isResponseSent) break;
-
-                        const chunkText = chunk.text();
-                        if (!chunkText) continue;
-
-                        fullResponseText += chunkText;
-                        chunkCount++;
-
-                        const responseData = {
-                            reply: chunkText,
-                            chatId: newChatId,
-                            chunkIndex: chunkCount,
-                            timestamp: Date.now()
-                        };
-
-                        if (!safeSend(responseData)) {
-                            console.log('Failed to send chunk, client may have disconnected');
-                            break;
-                        }
-
-                        // 添加少量延迟，避免过快的数据流
-                        if (chunkCount % 10 === 0) {
-                            await delay(10);
-                        }
-                    }
-
-                    const endTime = Date.now();
-                    console.log(`Stream completed successfully in ${endTime - startTime}ms with ${chunkCount} chunks`);
-                    success = true;
-
-                } catch (streamError) {
-                    console.error(`Stream error (attempt ${currentRetry + 1}/${maxRetries}):`, streamError);
-
-                    // 如果是不可重试的错误，直接抛出以终止循环
-                    if (isNonRetryableError(streamError)) {
-                        throw streamError;
-                    }
-
-                    currentRetry++;
-                    if (currentRetry < maxRetries) {
-                        // 发送重试通知给客户端
-                        safeSend({
-                            retry: true,
-                            attempt: currentRetry,
-                            maxRetries: maxRetries,
-                            chatId: newChatId
-                        });
-                        await delay(1000 * currentRetry);
-                    } else {
-                        // 所有重试都失败了
-                        throw new Error('All retry attempts failed after multiple connection issues.');
-                    }
-                }
-            }
-
-            if (!success && !isResponseSent) {
-                throw new Error('Failed to get response after all retries.');
-            }
-
-            // 保存历史记录
-            if (success && fullResponseText && fullResponseText.trim()) {
-                const userMessage = {
-                    role: 'user',
-                    parts: messageParts
-                };
-                const modelResponse = {
-                    role: 'model',
-                    parts: [{ text: fullResponseText }]
-                };
-                const updatedHistory = [...history, userMessage, modelResponse];
-
-                try {
-                    const newFilePath = path.join(HISTORIES_DIR, `${newChatId}.json`);
-                    await fs.writeFile(newFilePath, JSON.stringify(updatedHistory, null, 2));
-                    console.log(`History saved for chat ${newChatId}`);
-                } catch (saveError) {
-                    console.error('Error saving history:', saveError);
-                    // 发送保存失败通知，但不中断响应
-                    safeSend({
-                        warning: 'History save failed',
-                        chatId: newChatId
-                    });
-                }
-            }
-
-            // 发送完成信号
-            safeSend({
-                completed: true,
-                chatId: newChatId,
-                totalLength: fullResponseText.length
-            });
-        };
-
-        // 启动异步执行
-        executeChat().catch(error => {
-            console.error('Chat API Error in executeChat:', error);
-
-            const canRetry = !isNonRetryableError(error);
-            let errorMessage = `Server error: ${error.message}`;
-
-            // 为特定错误提供更友好的前端提示
-            if (error.message.toLowerCase().includes('api key')) {
-                errorMessage = 'API key is invalid or missing. Please check your configuration.';
-            } else if (error.message.toLowerCase().includes('quota')) {
-                errorMessage = 'API quota exceeded. Please try again later.';
-            } else if (error.message.toLowerCase().includes('model not found')) {
-                errorMessage = 'The requested model is not available. Please select another model.';
-            }
-
-            safeSend({
-                error: errorMessage,
-                chatId: newChatId || `error_${Date.now()}`,
-                canRetry: canRetry
-            });
-        }).finally(() => {
-            safeEnd();
+        // 存储任务所需的所有信息
+        jobs.set(jobId, {
+            status: 'pending',
+            chatId: newChatId,
+            history,
+            messageParts,
+            modelName,
+            isSearchEnabled,
+            fullResponseText: '',
+            error: null,
         });
+
+        // 立即响应，告知客户端任务已创建
+        res.status(202).json({ jobId, chatId: newChatId });
+
+        // 异步执行实际的聊天逻辑
+        executeChat(jobId);
 
     } catch (error) {
-        // 这个最外层的catch现在只处理准备阶段的同步错误
         console.error('Initial Chat Setup Error:', error);
-        safeSend({
-            error: `Server setup error: ${error.message}`,
-            chatId: newChatId || `error_${Date.now()}`,
-            canRetry: false
-        });
-        safeEnd();
+        res.status(500).json({ error: `Server setup error: ${error.message}` });
     }
 });
+
+// 核心聊天接口 - 步骤2: 通过SSE流式传输结果
+app.get('/api/chat/stream/:jobId', (req, res) => {
+    const { jobId } = req.params;
+    const job = jobs.get(jobId);
+
+    if (!job) {
+        return res.status(404).json({ error: 'Job not found' });
+    }
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    const sendEvent = (data) => {
+        if (!res.writableEnded) {
+            res.write(`data: ${JSON.stringify(data)}
+
+`);
+        }
+    };
+
+    const listener = (data) => {
+        sendEvent(data);
+        if (data.completed || data.error) {
+            res.end();
+        }
+    };
+
+    chatEvents.on(jobId, listener);
+
+    // 如果任务已经完成或失败，立即发送最终状态
+    if (job.status === 'completed' || job.status === 'failed') {
+        sendEvent({
+            [job.status === 'completed' ? 'completed' : 'error']: job.status === 'completed' ? true : job.error,
+            chatId: job.chatId,
+            totalLength: job.fullResponseText.length,
+            finalReply: job.fullResponseText // 发送完整回复以防万一
+        });
+        res.end();
+        return;
+    }
+
+
+    req.on('close', () => {
+        chatEvents.removeListener(jobId, listener);
+        console.log(`Client disconnected from job ${jobId}`);
+    });
+});
+
+
+// 核心聊天接口 - 步骤3: 后台执行Gemini请求和历史保存
+async function executeChat(jobId) {
+    const job = jobs.get(jobId);
+    if (!job) {
+        console.error(`Job ${jobId} not found for execution.`);
+        return;
+    }
+
+    const emit = (data) => chatEvents.emit(jobId, data);
+
+    try {
+        job.status = 'processing';
+        const { history, messageParts, modelName, isSearchEnabled, chatId } = job;
+
+        const modelConfig = {
+            model: modelName,
+            generationConfig: { temperature: 0.7, topP: 0.8, topK: 40, maxOutputTokens: 8192 }
+        };
+        if (isSearchEnabled) {
+            modelConfig.tools = [{ google_search: {} }];
+        }
+        const model = genAI.getGenerativeModel(modelConfig);
+        const chat = model.startChat({ history });
+
+        // emit({ status: 'THINKING', chatId });
+
+        let maxRetries = 3;
+        let currentRetry = 0;
+        let success = false;
+
+        while (currentRetry < maxRetries && !success) {
+            try {
+                console.log(`Job ${jobId}: Attempting to send message (attempt ${currentRetry + 1}/${maxRetries})`);
+                if (currentRetry > 0) job.fullResponseText = '';
+
+                const result = await chat.sendMessageStream(messageParts);
+
+                for await (const chunk of result.stream) {
+                    const chunkText = chunk.text();
+                    if (!chunkText) continue;
+                    job.fullResponseText += chunkText;
+                    emit({ reply: chunkText, chatId });
+                }
+                success = true;
+                console.log(`Job ${jobId}: Stream completed successfully.`);
+
+            } catch (streamError) {
+                console.error(`Job ${jobId}: Stream error (attempt ${currentRetry + 1}/${maxRetries}):`, streamError);
+                if (isNonRetryableError(streamError)) throw streamError;
+
+                currentRetry++;
+                if (currentRetry < maxRetries) {
+                    emit({ retry: true, attempt: currentRetry, maxRetries, chatId });
+                    await delay(1000 * currentRetry);
+                } else {
+                    throw new Error('All retry attempts failed after multiple connection issues.');
+                }
+            }
+        }
+
+        if (!success) {
+            throw new Error('Failed to get response after all retries.');
+        }
+
+        job.status = 'completed';
+        if (job.fullResponseText.trim()) {
+            const userMessage = { role: 'user', parts: messageParts };
+            const modelResponse = { role: 'model', parts: [{ text: job.fullResponseText }] };
+            const updatedHistory = [...history, userMessage, modelResponse];
+
+            try {
+                const newFilePath = path.join(HISTORIES_DIR, `${chatId}.json`);
+                await fs.writeFile(newFilePath, JSON.stringify(updatedHistory, null, 2));
+                console.log(`Job ${jobId}: History saved for chat ${chatId}`);
+            } catch (saveError) {
+                console.error(`Job ${jobId}: Error saving history:`, saveError);
+                emit({ warning: 'History save failed', chatId });
+            }
+        }
+
+        emit({ completed: true, chatId, totalLength: job.fullResponseText.length });
+
+    } catch (error) {
+        console.error(`Job ${jobId}: Chat execution failed:`, error);
+        job.status = 'failed';
+        job.error = error.message;
+
+        const canRetry = !isNonRetryableError(error);
+        let errorMessage = `Server error: ${error.message}`;
+        if (error.message.toLowerCase().includes('api key')) errorMessage = 'API key is invalid or missing.';
+        else if (error.message.toLowerCase().includes('quota')) errorMessage = 'API quota exceeded.';
+        else if (error.message.toLowerCase().includes('model not found')) errorMessage = 'The requested model is not available.';
+
+        emit({ error: errorMessage, chatId: job.chatId, canRetry });
+    } finally {
+        // Clean up the job from memory after some time to prevent memory leaks
+        setTimeout(() => {
+            jobs.delete(jobId);
+            console.log(`Job ${jobId} cleaned up from memory.`);
+        }, 5 * 60 * 1000); // 5 minutes
+    }
+}
 
 // 获取历史列表
 app.get('/api/history', async (req, res) => {
@@ -377,3 +333,12 @@ app.listen(port, host, () => {
 });
 
 console.log('Service started successfully!');
+
+
+// --- 优雅关闭 ---
+process.on('SIGINT', () => {
+    console.log('Received SIGINT. Shutting down gracefully...');
+    // 在这里可以添加清理逻辑，例如关闭数据库连接
+    process.exit(0);
+});
+""

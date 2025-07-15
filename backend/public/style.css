@@ -16,7 +16,7 @@
     --bodybgc: #FFF;
     --navbgc: linear-gradient(to right, #58AADD 0%, #DB5C7F 100%);
     --chatbgc: rgba(255, 255, 255, 0.5);
-    --df-ziji: #333;
+    --df-ziji: #111;
     --df-005: rgba(0, 0, 0, 0.05);
     --df-01: rgba(0, 0, 0, 0.1);
     --df-02: rgba(0, 0, 0, 0.2);
@@ -169,6 +169,7 @@ body {
     border-width: 0;
     z-index: 1000;
     right: 0;
+    /* font-weight: 550; */
     counter-reset: item-counter;
 }
 
@@ -201,7 +202,7 @@ body {
 .list-1 li,
 .list-1 h4 {
     display: block;
-    padding: 4px 6px;
+    padding: 6px 6px;
     font-size: 15px;
     /* font-weight: 550; */
     cursor: pointer;

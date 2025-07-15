@@ -18,7 +18,7 @@
 ```
 npm init -y
 
-npm install express multer @google/generative-ai dotenv cors
+npm install
 ```
 - 启动程序服务
 ```
