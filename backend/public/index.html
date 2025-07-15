@@ -29,7 +29,7 @@
         <ul id="list-dhdh" class="list-1"></ul>
         <main class="chat-area" id="chat-area">
             <div id="chat-window"></div>
-            <div class="input-area">
+            <div id="input-area" class="input-area">
                 <div id="file-preview-area" class="file-preview-area"></div>
                 <textarea id="prompt-input" placeholder="输入消息..." rows="2"></textarea>
                 <input type="file" id="file-input" multiple style="display: none;">
@@ -37,7 +37,7 @@
                     <div class="menu">
                         <button id="new-chat-btn">新建对话</button>
                         <button id="addfile"></button>
-                        <button id="Search" class="search" onclick="Sch()">联网搜索</button>
+                        <button id="Search" class="search">联网搜索</button>
                         <button id="send-btn" class="send-btn"></button>
                     </div>
                 </div>
@@ -45,74 +45,21 @@
         </main>
     </div>
     <script>
+        let selectedFiles = []; // 用于存储选择的文件
+        let SearchOn = false;   // 搜索开关
+        const inputarea = document.getElementById('input-area');
+        const Searchbtn = document.getElementById('Search');
+        const chatWindow = document.getElementById('chat-window');
+        const sendBtn = document.getElementById('send-btn');
+        const newChatBtn = document.getElementById('new-chat-btn');
+        const historyList = document.getElementById('history-list');
+        const chatarea = document.getElementById('chat-area');
+        const promptInput = document.getElementById('prompt-input');
+        const addFileBtn = document.getElementById('addfile');
+        const fileInput = document.getElementById('file-input');
+        const filePreviewArea = document.getElementById('file-preview-area');
+
         document.addEventListener('DOMContentLoaded', () => {
-            // DOM 元素
-            const chatWindow = document.getElementById('chat-window');
-            const promptInput = document.getElementById('prompt-input');
-            const sendBtn = document.getElementById('send-btn');
-            const newChatBtn = document.getElementById('new-chat-btn');
-            const historyList = document.getElementById('history-list');
-            const chatarea = document.getElementById('chat-area');
-            const addFileBtn = document.getElementById('addfile');
-            const fileInput = document.getElementById('file-input');
-            const filePreviewArea = document.getElementById('file-preview-area');
-
-            let selectedFiles = []; // 用于存储用户选择的文件
-
-            // --- 文件处理 ---
-            addFileBtn.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', (event) => {
-                const files = Array.from(event.target.files);
-                const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
-                let largeFilesDetected = false;
-
-                files.forEach(file => {
-                    if (file.size > MAX_FILE_SIZE_BYTES) {
-                        largeFilesDetected = true;
-                        console.warn(`文件 "${file.name}" (大小: ${file.size} 字节) 超过了 5MB 的限制，将被忽略。`);
-                    } else {
-                        // 检查是否已存在同名文件，避免重复添加
-                        if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
-                            selectedFiles.push(file);
-                        }
-                    }
-                });
-
-                if (largeFilesDetected) { alert('请选择小于5MB的文件'); }
-
-                renderFilePreviews();
-                fileInput.value = ''; // 清空input，以便可以再次选择同名文件
-            });
-
-            function renderFilePreviews() {
-                filePreviewArea.innerHTML = '';
-                if (selectedFiles.length > 0) {
-                    filePreviewArea.style.display = 'block';
-                } else {
-                    filePreviewArea.style.display = 'none';
-                    return;
-                }
-
-                selectedFiles.forEach((file, index) => {
-                    const preview = document.createElement('div');
-                    preview.classList.add('file-preview-item');
-
-                    const fileName = document.createElement('span');
-                    fileName.textContent = file.name;
-                    preview.appendChild(fileName);
-
-                    const removeBtn = document.createElement('button');
-                    removeBtn.textContent = '×';
-                    removeBtn.addEventListener('click', () => {
-                        selectedFiles.splice(index, 1);
-                        renderFilePreviews();
-                    });
-                    preview.appendChild(removeBtn);
-                    filePreviewArea.appendChild(preview);
-                });
-            }
-
-            // 应用状态
             let currentChatId = null;
 
             // --- 配置 marked.js 和 highlight.js ---
@@ -169,6 +116,7 @@
                     const fileCount = msg.parts.length - (textPart ? 1 : 0);
                     renderMessage(msg.role === 'user' ? 'user' : 'gemini', text, fileCount);
                 });
+                generateUserMessageIndex();
             }
 
             async function fetchAndRenderHistory() {
@@ -208,7 +156,6 @@
                     }
                     const messages = await response.json();
                     renderChatHistory(messages);
-                    generateUserMessageIndex();
                     currentChatId = chatId;
                     md();
                     localStorage.setItem('currentActiveChatId', chatId);
@@ -252,7 +199,8 @@
                 requestingIndicator.innerText = '发送中...';
                 aiMessageDiv.appendChild(requestingIndicator);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
-
+                generateUserMessageIndex();
+                
                 try {
                     // 步骤 1: 发送请求并获取 Job ID
                     const response = await fetch('/api/chat', {
@@ -288,7 +236,6 @@
                 } finally {
                     aiMessageDiv.classList.remove('loading');
                     sendBtn.disabled = false;
-                    generateUserMessageIndex();
                 }
             }
 
@@ -356,14 +303,14 @@
                                     if (accumulatedText === '') {
                                         aiMessageDiv.innerHTML = ''; // 首次收到回复时清除“思考中”
                                     }
-                                    
+
                                     const messageRect = aiMessageDiv.getBoundingClientRect();
                                     const containerRect = chatWindow.getBoundingClientRect();
                                     const messageAtTop = messageRect.top <= containerRect.top + 150;
 
                                     accumulatedText += data.reply;
                                     aiMessageDiv.innerHTML = marked.parse(accumulatedText);
-                                    
+
                                     if (!messageAtTop) { chatWindow.scrollTop = chatWindow.scrollHeight; };
                                 }
                             } catch (parseError) {
@@ -410,45 +357,9 @@
             // 新建对话
             newChatBtn.addEventListener('click', () => {
                 localStorage.removeItem('currentActiveChatId');
-                currentChatId = null;
-                chatWindow.innerHTML = '';
-                renderChatHistory([]);
-                generateUserMessageIndex();
+                // 刷新当前页面
+                location.reload();
             });
-
-            //对话导航
-            function generateUserMessageIndex() {
-                const indexList = document.getElementById('list-dhdh');
-                const userMessages = document.querySelectorAll('#chat-window .message.user-message');
-                indexList.innerHTML = '';
-                if (userMessages.length === 0) {
-                    const listTitle = document.createElement('h4');
-                    listTitle.textContent = '开始对话把！';
-                    indexList.appendChild(listTitle);
-                    return;
-                }
-                const listTitle = document.createElement('h4');
-                listTitle.textContent = '对话导航';
-                indexList.appendChild(listTitle);
-                userMessages.forEach((messageDiv, index) => {
-                    const messageId = `user-msg-${index}`;
-                    messageDiv.id = messageId;
-                    let messageText = messageDiv.querySelector('p')?.textContent || messageDiv.textContent;
-                    messageText = messageText.trim();
-                    if (!messageText) return;
-                    const displayText = messageText.length > 25 ? messageText.substring(0, 22) + '...' : messageText;
-                    const listItem = document.createElement('li');
-                    listItem.textContent = displayText;
-                    listItem.title = messageText;
-                    listItem.addEventListener('click', (event) => {
-                        const targetMessage = document.getElementById(messageId);
-                        if (targetMessage) {
-                            targetMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                    });
-                    indexList.appendChild(listItem);
-                });
-            }
 
             // --- 初始化
             async function initializeApp() {
@@ -458,7 +369,6 @@
                     await loadChatHistory(cachedChatId);
                 } else {
                     renderChatHistory([]);
-                    generateUserMessageIndex();
                 }
             }
 
@@ -466,6 +376,7 @@
         });
     </script>
     <script src="script.js"></script>
+    <script src="script2.js"></script>
 </body>
 
 </html>

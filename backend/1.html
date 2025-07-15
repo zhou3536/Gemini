@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #prompt-input {
+            width: 100%;
+            height: 200px;
+        }
+    </style>
+</head>
+<div class="input-area">
+    <div id="file-preview-area" class="file-preview-area"></div>
+    <textarea id="prompt-input" placeholder="输入消息..." rows="2"></textarea>
+    <input type="file" id="file-input" multiple style="display: none;">
+    <button id="addfile">添加文件</button>
+</div>
+
+<body>
+
+    <script>
+        // DOM 元素
+        const promptInput = document.getElementById('prompt-input');
+        const addFileBtn = document.getElementById('addfile');
+        const fileInput = document.getElementById('file-input');
+        const filePreviewArea = document.getElementById('file-preview-area');
+
+        let selectedFiles = []; // 用于存储用户选择的文件
+
+
+        addFileBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (event) => {
+            const files = Array.from(event.target.files);
+            const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+            let largeFilesDetected = false;
+
+            files.forEach(file => {
+                if (file.size > MAX_FILE_SIZE_BYTES) {
+                    largeFilesDetected = true;
+                    console.warn(`文件 "${file.name}" (大小: ${file.size} 字节) 超过了 5MB 的限制，将被忽略。`);
+                } else {
+                    // 检查是否已存在同名文件，避免重复添加
+                    if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                        selectedFiles.push(file);
+                    }
+                }
+            });
+
+            if (largeFilesDetected) { alert('请选择小于5MB的文件'); }
+
+            renderFilePreviews();
+            fileInput.value = ''; // 清空input，以便可以再次选择同名文件
+        });
+        function renderFilePreviews() {
+            filePreviewArea.innerHTML = '';
+            if (selectedFiles.length > 0) {
+                filePreviewArea.style.display = 'block';
+            } else {
+                filePreviewArea.style.display = 'none';
+                return;
+            }
+
+            selectedFiles.forEach((file, index) => {
+                const preview = document.createElement('div');
+                preview.classList.add('file-preview-item');
+
+                const fileName = document.createElement('span');
+                fileName.textContent = file.name;
+                preview.appendChild(fileName);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = '×';
+                removeBtn.addEventListener('click', () => {
+                    selectedFiles.splice(index, 1);
+                    renderFilePreviews();
+                });
+                preview.appendChild(removeBtn);
+                filePreviewArea.appendChild(preview);
+            });
+        }
+    </script>
+</body>
+
+</html>

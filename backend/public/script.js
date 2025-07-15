@@ -120,8 +120,8 @@ if (savedValue) {
     modelSelect.value = savedValue;
 }
 
-let SearchOn = false
-function Sch() {
+//搜索开关
+Searchbtn.addEventListener("click", function () {
     const aaa = document.getElementById('Search');
     if (SearchOn) {
         aaa.classList.remove('SearchON')
@@ -130,7 +130,8 @@ function Sch() {
         aaa.classList.add('SearchON')
         SearchOn = true
     }
-}
+});
+
 //手机打开对话导航
 let dhdh = false;
 function opendhdh() {

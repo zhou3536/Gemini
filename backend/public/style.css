@@ -415,10 +415,15 @@ body {
     border: 2px solid rgba(30, 173, 255, 0.3);
 }
 
+.drag-over {
+    outline: 1px dashed #2e93ff;
+    background-color: #e6f7ff;
+}
+
 #prompt-input {
     width: 100%;
     flex-grow: 1;
-    padding: 10px;
+    padding: 5px 2px;
     outline: none;
     border: none;
     border-radius: 5px;
@@ -431,10 +436,6 @@ body {
     color: var(--df-ziji);
     background-color: transparent;
 }
-
-/* .input-area:focus-within {
-    border: 2px solid #1eacff;
-} */
 
 .send-box {
     position: relative;
@@ -543,7 +544,7 @@ body {
 
 .file-preview-item span {
     padding: 0 5px;
-    border-radius: 10px;
+    border-radius: 5px;
     background-color: var(--df-01);
     max-width: 150px;
     white-space: nowrap;
@@ -551,7 +552,7 @@ body {
     text-overflow: ellipsis;
     display: inline-block;
     vertical-align: middle;
-
+    cursor: default;
 }
 
 .file-preview-item button {
@@ -568,6 +569,7 @@ body {
     background-color: var(--df-01);
 
 }
+
 button:disabled {
     cursor: not-allowed !important;
     opacity: 0.3;
