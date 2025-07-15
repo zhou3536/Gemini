@@ -558,11 +558,13 @@ body {
     height: 12px;
     text-align: center;
     margin-left: 1px;
-    line-height: 10px;
+    line-height: 12px;
     display: inline-block;
     vertical-align: middle;
     border: none;
     border-radius: 20px;
+    color: var(--df-ziji);
+    background-color: var(--df-01);
 
 }
 button:disabled {
