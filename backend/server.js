@@ -45,13 +45,6 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// 检查错误是否是不可重试的配置/API错误
-function isNonRetryableError(error) {
-    const errorMessage = error.message.toLowerCase();
-    const nonRetryableKeywords = ['api key', 'quota', 'permission denied', 'model not found', 'invalid argument'];
-    return nonRetryableKeywords.some(keyword => errorMessage.includes(keyword));
-}
-
 async function fileToGenerativePart(file) {
     const fileBuffer = await fs.readFile(file.path);
     const base64EncodedData = fileBuffer.toString('base64');
@@ -192,8 +185,6 @@ async function executeChat(jobId) {
         const model = genAI.getGenerativeModel(modelConfig);
         const chat = model.startChat({ history });
 
-        // emit({ status: 'THINKING', chatId });
-
         let maxRetries = 3;
         let currentRetry = 0;
         let success = false;
@@ -216,13 +207,25 @@ async function executeChat(jobId) {
 
             } catch (streamError) {
                 console.error(`Job ${jobId}: Stream error (attempt ${currentRetry + 1}/${maxRetries}):`, streamError);
-                if (isNonRetryableError(streamError)) throw streamError;
+                
+                // Google AI SDK 错误通常包含 status code，或者嵌套在 response 对象里
+                const statusCode = streamError.status || (streamError.response && streamError.response.status);
 
+                // 如果是 4xx (客户端错误) 或 5xx (服务端错误)，则不应重试，立即抛出错误
+                // 这会捕获 API Key 无效、请求格式错误、模型不可用等问题
+                if (statusCode && statusCode >= 400 && statusCode < 600) {
+                    const apiError = new Error(streamError.message);
+                    apiError.statusCode = statusCode; // 将状态码附加到错误对象上
+                    throw apiError; // 抛到外层的 catch 块处理
+                }
+
+                // 对于其他错误 (如网络连接超时)，执行重试逻辑
                 currentRetry++;
                 if (currentRetry < maxRetries) {
                     emit({ retry: true, attempt: currentRetry, maxRetries, chatId });
                     await delay(1000 * currentRetry);
                 } else {
+                    // 重试耗尽，抛出最终错误
                     throw new Error('All retry attempts failed after multiple connection issues.');
                 }
             }
@@ -255,13 +258,14 @@ async function executeChat(jobId) {
         job.status = 'failed';
         job.error = error.message;
 
-        const canRetry = !isNonRetryableError(error);
-        let errorMessage = `Server error: ${error.message}`;
-        if (error.message.toLowerCase().includes('api key')) errorMessage = 'API key is invalid or missing.';
-        else if (error.message.toLowerCase().includes('quota')) errorMessage = 'API quota exceeded.';
-        else if (error.message.toLowerCase().includes('model not found')) errorMessage = 'The requested model is not available.';
+        const errorMessage = `Server error: ${error.message}`;
 
-        emit({ error: errorMessage, chatId: job.chatId, canRetry });
+        // 将包含状态码的结构化错误发送给前端
+        emit({ 
+            error: errorMessage, 
+            statusCode: error.statusCode || 'N/A', // 如果有状态码，一并发送
+            chatId: job.chatId 
+        });
     } finally {
         // Clean up the job from memory after some time to prevent memory leaks
         setTimeout(() => {
@@ -329,7 +333,7 @@ app.delete('/api/history/:chatId', async (req, res) => {
 app.listen(port, host, () => {
     fs.mkdir(HISTORIES_DIR, { recursive: true });
     fs.mkdir(UPLOADS_DIR, { recursive: true });
-    console.log(`Server is listening on port : ${port}, Listening address : ${host}`);
+    console.log(`Service is listening on port : ${port}, Listening address : ${host}`);
 });
 
 console.log('Service started successfully!');
@@ -338,7 +342,6 @@ console.log('Service started successfully!');
 // --- 优雅关闭 ---
 process.on('SIGINT', () => {
     console.log('Received SIGINT. Shutting down gracefully...');
-    // 在这里可以添加清理逻辑，例如关闭数据库连接
     process.exit(0);
 });
 ""

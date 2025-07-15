@@ -298,9 +298,13 @@
                     let accumulatedText = '';
                     let eventSource;
                     let retryCount = 0;
-                    const maxRetries = 3;
+                    const maxRetries = 3; // 前端只处理连接中断的重试
 
                     const connect = () => {
+                        // 如果已经有EventSource实例，先关闭
+                        if (eventSource) {
+                            eventSource.close();
+                        }
                         eventSource = new EventSource(`/api/chat/stream/${jobId}`);
 
                         aiMessageDiv.innerHTML = `<i>${SearchOn ? '正在搜索互联网...' : '正在思考...'}</i>`;
@@ -309,18 +313,20 @@
                             try {
                                 const data = JSON.parse(event.data);
 
+                                // 核心修改：处理来自后端的结构化错误
                                 if (data.error) {
-                                    throw new Error(data.error);
+                                    eventSource.close(); // 收到明确错误，关闭连接，不再重试
+                                    const errorCode = data.statusCode && data.statusCode !== 'N/A' ? ` (代码: ${data.statusCode})` : '';
+                                    const errorMessage = `抱歉，请求失败: ${data.error}${errorCode}`;
+                                    renderMessage('gemini', errorMessage, 0, aiMessageDiv);
+                                    reject(new Error(errorMessage));
+                                    return;
                                 }
 
-                                // if (data.status === 'THINKING') {
-                                //     aiMessageDiv.innerHTML = `<i>${SearchOn ? '正在搜索互联网...' : '正在思考...'}</i>`;
-                                //     return;
-                                // }
-
+                                // 处理后端正在重试的通知
                                 if (data.retry) {
                                     const retryInfo = document.createElement('i');
-                                    retryInfo.innerText = `连接中断，正在重试... (${data.attempt}/${data.maxRetries})`;
+                                    retryInfo.innerText = `后端服务暂时中断，正在重试... (${data.attempt}/${data.maxRetries})`;
                                     retryInfo.style.color = '#ff6b6b';
                                     aiMessageDiv.appendChild(retryInfo);
                                     return;
@@ -350,19 +356,23 @@
                                     if (accumulatedText === '') {
                                         aiMessageDiv.innerHTML = ''; // 首次收到回复时清除“思考中”
                                     }
-
+                                    
                                     const messageRect = aiMessageDiv.getBoundingClientRect();
                                     const containerRect = chatWindow.getBoundingClientRect();
                                     const messageAtTop = messageRect.top <= containerRect.top + 150;
 
                                     accumulatedText += data.reply;
                                     aiMessageDiv.innerHTML = marked.parse(accumulatedText);
-                                    // chatWindow.scrollTop = chatWindow.scrollHeight;
+                                    
                                     if (!messageAtTop) { chatWindow.scrollTop = chatWindow.scrollHeight; };
                                 }
                             } catch (parseError) {
                                 console.error('Error parsing stream data:', parseError);
-                                // 不在这里关闭连接，让 onerror 处理
+                                // 解析错误也应终止
+                                eventSource.close();
+                                const errorMessage = `解析响应失败: ${parseError.message}`;
+                                renderMessage('gemini', errorMessage, 0, aiMessageDiv);
+                                reject(parseError);
                             }
                         };
 
@@ -370,13 +380,14 @@
                             eventSource.close();
                             console.error('EventSource failed:', err);
 
+                            // 只有在未收到明确错误时，才进行前端的网络重试
                             if (retryCount < maxRetries) {
                                 retryCount++;
                                 const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
                                 aiMessageDiv.innerHTML = `<i>连接丢失，${delay / 1000}秒后重试... (${retryCount}/${maxRetries})</i>`;
                                 setTimeout(connect, delay);
                             } else {
-                                const finalError = new Error(`无法连接到服务器获取结果，请检查网络连接。`);
+                                const finalError = new Error(`无法连接到服务器，请检查您的网络连接或稍后再试。`);
                                 renderMessage('gemini', finalError.message, 0, aiMessageDiv);
                                 reject(finalError);
                             }
