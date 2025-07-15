@@ -37,7 +37,7 @@ fileInput.addEventListener('change', (event) => {
 function renderFilePreviews() {
     filePreviewArea.innerHTML = ''; // 清空现有预览
     if (selectedFiles.length > 0) {
-        filePreviewArea.style.display = 'flex'; // 有文件时显示
+        filePreviewArea.style.display = 'block'; // 有文件时显示
     } else {
         filePreviewArea.style.display = 'none'; // 无文件时隐藏
         return;
