@@ -260,12 +260,12 @@
 
 .gemini-message .copy-button:hover {
     border: 1px solid var(--df-02);
-    background-color: var(--df-02);
+    background-color: var(--df-005);
 }
 
 .gemini-message .copy-button:active {
     border: 1px solid var(--df-04);
-    background-color: var(--df-04);
+    background-color: var(--df-01);
 }
 
 .gemini-message .copy-button::before {
