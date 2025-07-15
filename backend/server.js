@@ -158,9 +158,8 @@ app.post('/api/chat', upload.array('files'), async (req, res) => {
 
         newChatId = chatId || `${Date.now()}`;
 
-        // 立即发送“思考中”信号，让前端可以更新UI
+        // 立即发送"思考中"信号，让前端可以更新UI
         if (!safeSend({ status: 'THINKING', chatId: newChatId })) {
-            // 如果发送失败，说明客户端已经断开连接，无需继续
             return safeEnd();
         }
 
@@ -242,12 +241,11 @@ app.post('/api/chat', upload.array('files'), async (req, res) => {
             }
 
             if (!success && !isResponseSent) {
-                // 如果循环结束但未成功，说明所有重试都失败了
                 throw new Error('Failed to get response after all retries.');
             }
 
             // 保存历史记录
-            if (success && fullResponseText.trim()) {
+            if (success && fullResponseText && fullResponseText.trim()) {
                 const userMessage = {
                     role: 'user',
                     parts: messageParts
