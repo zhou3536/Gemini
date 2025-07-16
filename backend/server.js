@@ -11,11 +11,11 @@ import multer from 'multer';
 import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
 
-// 引入密码认证模块
-import { initializeAuth } from './auth.js';
-
 // --- 配置 ---
 dotenv.config();
+
+// 引入密码认证模块
+import { initializeAuth } from './auth.js';
 
 // __dirname 在 ES Module 中不可用，需要手动创建
 const __filename = fileURLToPath(import.meta.url);
@@ -39,8 +39,8 @@ chatEvents.setMaxListeners(0); // 无限监听器以避免警告
 app.use(cors());
 app.use(express.json());
 
-// --- 调用认证模块初始化函数 ---
-initializeAuth(app);
+// --- 调用认证模块初始化函数，传入环境变量 ---
+initializeAuth(app, process.env.accessPassword, process.env.cookieSecret);
 
 // 静态文件服务
 app.use(express.static(path.join(__dirname, 'public')));

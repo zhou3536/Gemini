@@ -9,15 +9,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // 从环境变量获取配置
-const ACCESS_PASSWORD = 'cxk2022';
-const COOKIE_SECRET = 'JXyUgsAQxg02yNV1s0rWrSJfdia3Z';
-const AUTH_COOKIE_NAME = 'access_granted'; // 认证Cookie的名称
-const SESSION_DURATION_MS = 240 * 60 * 60 * 1000; // 240小时
+let ACCESS_PASSWORD;
+let COOKIE_SECRET;
+const AUTH_COOKIE_NAME = 'access_granted';
+const SESSION_DURATION_MS = 240 * 60 * 60 * 1000;
 
 // 认证中间件
 const authenticateMiddleware = (req, res, next) => {
     // 豁免登录相关的路径和静态资源 (login.html)
-    // 注意：这里的路径需要与主应用中的静态文件服务和路由匹配
     if (req.path === '/login.html' || req.path === '/api/login' || req.path === '/api/logout' || req.path === '/favicon.ico') {
         return next();
     }
@@ -49,8 +48,8 @@ const loginRoute = (req, res) => {
         return res.status(500).json({ message: 'Server authentication not configured.' });
     }
 
+    // 密码正确，设置认证Cookie
     if (password === ACCESS_PASSWORD) {
-        // 密码正确，设置认证Cookie
         res.cookie(AUTH_COOKIE_NAME, 'true', {
             maxAge: SESSION_DURATION_MS, // 48小时过期
             httpOnly: true, // 客户端JS无法访问
@@ -80,7 +79,9 @@ const logoutRoute = (req, res) => {
  * 初始化认证模块并将其应用于Express应用。
  * @param {Express.Application} app Express应用实例
  */
-const initializeAuth = (app) => {
+const initializeAuth = (app, accessPassword, cookieSecret) => {
+    ACCESS_PASSWORD = accessPassword;
+    COOKIE_SECRET = cookieSecret;
     // 检查必要的环境变量
     if (!ACCESS_PASSWORD || !COOKIE_SECRET) {
         console.error('ERROR: ACCESS_PASSWORD or COOKIE_SECRET environment variables are not set!');
