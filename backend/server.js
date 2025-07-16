@@ -177,7 +177,7 @@ async function executeChat(jobId) {
 
         const modelConfig = {
             model: modelName,
-            generationConfig: { temperature: 0.7, topP: 0.8, topK: 40, maxOutputTokens: 8192 }
+            generationConfig: { temperature: 0.7, topP: 0.8, topK: 40, maxOutputTokens: 20480 }
         };
         if (isSearchEnabled) {
             modelConfig.tools = [{ google_search: {} }];
@@ -212,11 +212,10 @@ async function executeChat(jobId) {
                 const statusCode = streamError.status || (streamError.response && streamError.response.status);
 
                 // 如果是 4xx (客户端错误) 或 5xx (服务端错误)，则不应重试，立即抛出错误
-                // 这会捕获 API Key 无效、请求格式错误、模型不可用等问题
                 if (statusCode && statusCode >= 400 && statusCode < 600) {
                     const apiError = new Error(streamError.message);
-                    apiError.statusCode = statusCode; // 将状态码附加到错误对象上
-                    throw apiError; // 抛到外层的 catch 块处理
+                    apiError.statusCode = statusCode;
+                    throw apiError;
                 }
 
                 // 对于其他错误 (如网络连接超时)，执行重试逻辑
@@ -225,7 +224,6 @@ async function executeChat(jobId) {
                     emit({ retry: true, attempt: currentRetry, maxRetries, chatId });
                     await delay(1000 * currentRetry);
                 } else {
-                    // 重试耗尽，抛出最终错误
                     throw new Error('All retry attempts failed after multiple connection issues.');
                 }
             }
@@ -267,7 +265,6 @@ async function executeChat(jobId) {
             chatId: job.chatId 
         });
     } finally {
-        // Clean up the job from memory after some time to prevent memory leaks
         setTimeout(() => {
             jobs.delete(jobId);
             console.log(`Job ${jobId} cleaned up from memory.`);
