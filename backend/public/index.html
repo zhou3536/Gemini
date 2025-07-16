@@ -12,6 +12,7 @@
 </head>
 
 <body>
+    <div id="welcome">探索无界限</div>
     <div class="nav">
         <button class="theme-toggle" id="themeToggle"></button>
         <select id="gemini-v" class="send-btn1">
@@ -47,6 +48,7 @@
     <script>
         let selectedFiles = []; // 用于存储选择的文件
         let SearchOn = false;   // 搜索开关
+        const welcome = document.getElementById('welcome');
         const inputarea = document.getElementById('input-area');
         const Searchbtn = document.getElementById('Search');
         const chatWindow = document.getElementById('chat-window');
@@ -107,7 +109,7 @@
             function renderChatHistory(messages) {
                 chatWindow.innerHTML = '';
                 if (!messages || messages.length === 0) {
-                    renderMessage('gemini', 'Hello! 今天有什么可以帮你？');
+                    welcome.style.display = 'block';
                     return;
                 }
                 messages.forEach(msg => {
@@ -117,6 +119,7 @@
                     renderMessage(msg.role === 'user' ? 'user' : 'gemini', text, fileCount);
                 });
                 generateUserMessageIndex();
+                welcome.style.display = 'none';
             }
 
             async function fetchAndRenderHistory() {
@@ -171,9 +174,9 @@
                 const prompt = promptInput.value.trim();
                 const modelSelect = document.getElementById('gemini-v');
                 const selectedModel = modelSelect.value;
-
                 if (!prompt && selectedFiles.length === 0) return;
 
+                welcome.style.display = 'none';
                 sendBtn.disabled = true;
                 renderMessage('user', prompt, selectedFiles.length);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -200,7 +203,7 @@
                 aiMessageDiv.appendChild(requestingIndicator);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
                 generateUserMessageIndex();
-                
+
                 try {
                     // 步骤 1: 发送请求并获取 Job ID
                     const response = await fetch('/api/chat', {
