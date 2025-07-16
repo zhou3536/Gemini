@@ -11,6 +11,9 @@ import multer from 'multer';
 import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
 
+// 引入密码认证模块
+import { initializeAuth } from './auth.js';
+
 // --- 配置 ---
 dotenv.config();
 
@@ -35,6 +38,11 @@ chatEvents.setMaxListeners(0); // 无限监听器以避免警告
 // --- 中间件 ---
 app.use(cors());
 app.use(express.json());
+
+// --- 调用认证模块初始化函数 ---
+initializeAuth(app);
+
+// 静态文件服务
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
@@ -207,7 +215,7 @@ async function executeChat(jobId) {
 
             } catch (streamError) {
                 console.error(`Job ${jobId}: Stream error (attempt ${currentRetry + 1}/${maxRetries}):`, streamError);
-                
+
                 // Google AI SDK 错误通常包含 status code，或者嵌套在 response 对象里
                 const statusCode = streamError.status || (streamError.response && streamError.response.status);
 
@@ -259,10 +267,10 @@ async function executeChat(jobId) {
         const errorMessage = `Server error: ${error.message}`;
 
         // 将包含状态码的结构化错误发送给前端
-        emit({ 
-            error: errorMessage, 
+        emit({
+            error: errorMessage,
             statusCode: error.statusCode || 'N/A', // 如果有状态码，一并发送
-            chatId: job.chatId 
+            chatId: job.chatId
         });
     } finally {
         setTimeout(() => {
@@ -341,4 +349,3 @@ process.on('SIGINT', () => {
     console.log('Received SIGINT. Shutting down gracefully...');
     process.exit(0);
 });
-""

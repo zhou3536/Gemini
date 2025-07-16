@@ -134,8 +134,12 @@
                     const DelHistory = document.createElement('a');
                     DelHistory.textContent = '管理历史';
                     DelHistory.href = 'del.html';
+                    const logout = document.createElement('a');
+                    logout.textContent = '退出登录';
+                    logout.addEventListener('click', () => { gmmlogout() });
                     Title.appendChild(listTitle);
                     Title.appendChild(DelHistory);
+                    Title.appendChild(logout);
                     historyList.appendChild(Title);
                     histories.forEach(h => {
                         const li = document.createElement('li');

@@ -148,4 +148,42 @@ function generateUserMessageIndex() {
         });
         indexList.appendChild(listItem);
     });
+};
+
+//退出登录
+async function gmmlogout() {
+    try {
+        const response = await fetch('/api/logout', {
+            method: 'POST', // 确保是 POST 请求
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            // alert('You have been logged out.');
+            window.location.href = '/login.html'; 
+        }
+    } catch (error) {
+        console.error('Error during logout:', error);
+        alert('An error occurred during logout. Please try again.');
+    }
 }
+
+async function checkLoginStatus() {
+    try {
+        // 尝试访问一个受保护的API，例如 /api/history
+        const response = await fetch('/api/history');
+        if (!response.ok && response.status === 401) {
+            // 如果未授权，重定向到登录页
+            window.location.href = '/login.html';
+        }
+    } catch (error) {
+        console.error('Error checking login status:', error);
+        // 网络错误也可能导致无法访问API，也重定向到登录页
+        window.location.href = '/login.html';
+    }
+}
+
+// 在页面加载时检查登录状态
+window.onload = checkLoginStatus;
