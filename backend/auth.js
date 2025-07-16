@@ -160,7 +160,7 @@ const initializeAuth = (app, accessPassword, cookieSecret) => {
 
     setInterval(cleanupLoginAttempts, CLEANUP_INTERVAL_MS);
     console.log('Authentication module initialized.');
-    console.log(`Login rate limit: 1 request per ${LOGIN_RATE_LIMIT_INTERVAL_MS / 1000} seconds.`);
+    // console.log(`Login rate limit: 1 request per ${LOGIN_RATE_LIMIT_INTERVAL_MS / 1000} seconds.`);
 };
 
 export { initializeAuth };

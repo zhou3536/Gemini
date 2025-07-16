@@ -341,9 +341,6 @@ app.listen(port, host, () => {
     console.log(`Start HTTP server @ ${host}:${port}`);
 });
 
-console.log('Service started successfully!');
-
-
 // --- 优雅关闭 ---
 process.on('SIGINT', () => {
     console.log('Received SIGINT. Shutting down gracefully...');
