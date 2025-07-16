@@ -18,7 +18,7 @@ const SESSION_DURATION_MS = 240 * 60 * 60 * 1000; // 240小时
 const authenticateMiddleware = (req, res, next) => {
     // 豁免登录相关的路径和静态资源 (login.html)
     // 注意：这里的路径需要与主应用中的静态文件服务和路由匹配
-    if (req.path === '/login.html' || req.path === '/api/login' || req.path === '/api/logout') {
+    if (req.path === '/login.html' || req.path === '/api/login' || req.path === '/api/logout' || req.path === '/favicon.ico') {
         return next();
     }
 
