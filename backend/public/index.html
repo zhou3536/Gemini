@@ -32,7 +32,7 @@
             <div id="chat-window"></div>
             <div id="input-area" class="input-area">
                 <div id="file-preview-area" class="file-preview-area"></div>
-                <textarea id="prompt-input" placeholder="输入消息..." rows="2"></textarea>
+                <textarea id="prompt-input" placeholder="您的问题总能找到答案" rows="2"></textarea>
                 <input type="file" id="file-input" multiple style="display: none;">
                 <div class="send-box">
                     <div class="menu">
@@ -110,6 +110,7 @@
                 chatWindow.innerHTML = '';
                 if (!messages || messages.length === 0) {
                     welcome.style.display = 'block';
+                    generateUserMessageIndex();
                     return;
                 }
                 messages.forEach(msg => {
@@ -360,8 +361,9 @@
             // 新建对话
             newChatBtn.addEventListener('click', () => {
                 localStorage.removeItem('currentActiveChatId');
-                // 刷新当前页面
-                location.reload();
+                currentChatId = null;
+                chatWindow.innerHTML = '';
+                renderChatHistory([]);
             });
 
             // --- 初始化

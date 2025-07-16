@@ -123,7 +123,7 @@ function generateUserMessageIndex() {
     indexList.innerHTML = '';
     if (userMessages.length === 0) {
         const listTitle = document.createElement('h4');
-        listTitle.textContent = '开始对话把！';
+        listTitle.textContent = '开始新的对话把！';
         indexList.appendChild(listTitle);
         return;
     }

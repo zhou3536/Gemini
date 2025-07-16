@@ -27,8 +27,8 @@
         }
 
         h3 {
-            margin-bottom: 8px;
-            padding: 8px;
+            margin-bottom: 15px;
+            padding: 8px 0;
             background: var(--bodybgc);
             position: sticky;
             top: 0;
@@ -37,8 +37,10 @@
         a {
             color: var(--dfziti);
             text-decoration: none;
-            /* width: 100%; */
-            /* display: block; */
+            padding: 5px 10px;
+            border-radius: 6px;
+            background-color: var(--df-005);
+            border: 1px solid var(--df-01);
         }
 
 
@@ -59,17 +61,32 @@
 
         }
 
-        li span {
-            display: block;
-            width: 100%;
+        .divbox {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
+        .title {
+            /* display: block; */
+            /* width: 100%; */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 550;
+        }
+
+        .time {
+            font-size: 12px;
+            margin-top: 5px;
+            margin-left: 2px;
+        }
+
         button {
             width: 60px;
             height: 30px;
+            min-width: 60px;
+            min-height: 30px;
             /* margin-right: 5px; */
             border-radius: 5px;
             background-color: rgba(0, 0, 0, 0.1);
@@ -97,6 +114,26 @@
     <script>
         const historyList = document.getElementById('historyList');
 
+        function formatTimestampToDateTime(timestamp) {
+            // 确保时间戳是数字类型，因为JSON解析后可能是字符串
+            const ts = parseInt(timestamp);
+            if (isNaN(ts)) {
+                return "Invalid Date"; // 如果时间戳无效，返回错误信息
+            }
+
+            const date = new Date(ts);
+
+            const year = date.getFullYear();
+            // getMonth() 返回 0-11，所以需要加 1
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        }
+
+
         async function loadHistory() {
             try {
                 const response = await fetch('/api/history');
@@ -106,17 +143,24 @@
 
                 history.forEach((item, index) => {
                     const listItem = document.createElement('li');
-                    const titleSpan = document.createElement('span');
-                    titleSpan.textContent = `${index + 1}. ${item.title}`;
-                    listItem.appendChild(titleSpan);
+                    const divbox = document.createElement('div');
+                    const title = document.createElement('div');
+                    const formattedDate = formatTimestampToDateTime(item.chatId);
+                    const time = document.createElement('div');
+                    divbox.classList.add('divbox')
+                    title.textContent = `${index + 1}. ${item.title}`;
+                    title.classList.add('title');
+                    time.innerText = formattedDate;
+                    time.classList.add('time');
+                    divbox.appendChild(title);
+                    divbox.appendChild(time);
+
+                    listItem.appendChild(divbox);
 
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = '删除';
                     deleteButton.onclick = () => deleteHistory(item.chatId);
                     listItem.appendChild(deleteButton);
-
-                    listItem.appendChild(document.createTextNode(' ')); // Add space between title and button
-
 
                     historyList.appendChild(listItem);
                 });
@@ -145,7 +189,6 @@
             }
         }
 
-        // Load history on page load
         loadHistory();
 
         //切换主题
