@@ -56,13 +56,14 @@
         .login-container {
             position: absolute;
             left: 50%;
-            top: 40%;
+            top: 45%;
             transform: translateX(-50%) translateY(-50%);
             /* padding: 30px; */
             border-radius: 8px;
             /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
             text-align: center;
             max-width: 320px;
+            height: 300px;
         }
 
         .login-container h2 {
@@ -137,6 +138,8 @@
             const password = document.getElementById('passwordInput').value;
             const messageDiv = document.getElementById('message');
             messageDiv.textContent = '';
+
+            if(!password){return};
 
             try {
                 const response = await fetch('/api/login', {
