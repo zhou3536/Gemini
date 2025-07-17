@@ -123,13 +123,17 @@ body {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
+#installButton {
+    background-image: url('img/dl.png');
+}
+
 .hisbtn {
-    background-image: url('hh.png');
+    background-image: url('img/hh.png');
 }
 
 .dhdhbtn {
     display: none;
-    background-image: url('dh.png');
+    background-image: url('img/dh.png');
 }
 
 #gemini-v {
@@ -337,11 +341,11 @@ body {
 }
 
 .user-message::before {
-    background-image: url('avt.png');
+    background-image: url('img/avt.png');
 }
 
 .gemini-message::before {
-    background-image: url('gmm.png');
+    background-image: url('img/gmm.png');
 }
 
 .user-message::after,
@@ -501,7 +505,7 @@ body {
 }
 
 #send-btn {
-    background-image: url('send.png');
+    background-image: url('img/send.png');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;

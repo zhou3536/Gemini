@@ -9,18 +9,21 @@
     <link rel="stylesheet" href="md.css">
     <script src="highlight.min.js"></script>
     <script src="marked.min.js"></script>
+    <link rel="manifest" href="/manifest.json">
 </head>
 
 <body>
     <div id="welcome">探索无界限</div>
     <div class="nav">
         <button class="theme-toggle" id="themeToggle"></button>
+        
         <select id="gemini-v" class="send-btn1">
             <option value="gemini-2.5-flash-lite-preview-06-17">Gemini-2.5-F-Lite</option>
             <option value="gemini-2.5-flash">Gemini-2.5-Flash</option>
             <option value="gemini-2.5-pro">Gemini-2.5-Pro</option>
         </select>
         <div class="btnbox">
+            <button id="installButton"></button>
             <button class="dhdhbtn" onclick="opendhdh()"></button>
             <button class="hisbtn" id="history-b"></button>
         </div>
@@ -386,6 +389,7 @@
     </script>
     <script src="script.js"></script>
     <script src="script2.js"></script>
+    <script src="script3.js"></script>
 </body>
 
 </html>

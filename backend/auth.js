@@ -74,7 +74,11 @@ const cleanupLoginAttempts = () => {
 // --- 认证中间件和路由处理函数 ---
 
 const authenticateMiddleware = (req, res, next) => {
-    if (req.path === '/login.html' || req.path === '/api/login' || req.path === '/api/logout' || req.path === '/favicon.ico') {
+    if (req.path === '/api/login' || req.path === '/api/logout') {
+        return next();
+    }
+
+    if (!req.path.startsWith('/api')) {
         return next();
     }
 
