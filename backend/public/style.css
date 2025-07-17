@@ -444,7 +444,7 @@ body {
 
 .drag-over {
     outline: 1px dashed #2e93ff;
-    background-color: #e6f7ff;
+    background-color: #2e93ff30;
 }
 
 #prompt-input {
