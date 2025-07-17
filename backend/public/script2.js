@@ -162,7 +162,7 @@ async function gmmlogout() {
 
         if (response.ok) {
             // alert('You have been logged out.');
-            window.location.href = '/'; 
+            window.location.href = '/login.html'; 
         }
     } catch (error) {
         console.error('Error during logout:', error);
