@@ -138,6 +138,7 @@ Searchbtn.addEventListener("click", function () {
 
 //手机打开对话导航
 let dhdh = false;
+if (window.innerWidth >= 1220) {dhdh = true};
 function opendhdh() {
     const listdhdh = document.getElementById('list-dhdh')
     if (dhdh) {

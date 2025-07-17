@@ -88,23 +88,16 @@ body {
 }
 
 #themeToggle {
-    /* position: absolute; */
-    /* left: 6px; */
-    /* display: block; */
     width: 25px;
     height: 25px;
-    /* background-color: transparent; */
     display: flex;
     justify-content: center;
     align-content: center;
     flex-wrap: wrap;
-    /* border: 1px solid rgba(255, 255, 255, 0.2); */
-    /* border-radius: 5px; */
+
 }
 
 .btnbox {
-    /* width: 100px; */
-    /* height: 30px; */
     display: flex;
     gap: 5px;
     position: absolute;
@@ -126,10 +119,6 @@ body {
 
 .nav button:active {
     background-color: rgba(255, 255, 255, 0.3);
-}
-
-#installButton {
-    background-image: url('img/dl.png');
 }
 
 .nav .hisbtn {
@@ -187,7 +176,8 @@ body {
     border-width: 0;
     z-index: 1000;
 }
-#history-list li{
+
+#history-list li {
     margin-left: 6px;
     margin-right: 15px;
     padding: 8px;
@@ -201,10 +191,15 @@ body {
     width: 200px;
     counter-reset: item-counter;
 }
+
 #list-dhdh li {
     margin: 0 3px;
     padding: 3px 8px;
     border-radius: 5px;
+}
+
+#list-dhdh h4 {
+    background-color: var(--bodybgc);
 }
 
 .list-1 {
@@ -217,6 +212,7 @@ body {
     z-index: 999;
     border: 1px solid var(--df-01);
     transition: all 0.3s ease;
+    padding-bottom: 5px;
 }
 
 .list-1:empty {
