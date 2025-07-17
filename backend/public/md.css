@@ -10,7 +10,7 @@
 }
 
 [data-theme="dark"] {
-    --perbgc: transition;
+    --perbgc: #F0F8FF04;
     --per-df: #eee;
     --code: #abe2ff;
     --hljs-string: #b0c461;

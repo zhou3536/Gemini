@@ -84,13 +84,18 @@
             border: 1px solid var(--df-02);
             border-radius: 4px;
             font-size: 16px;
-            background-color: var(--df-01);
+            background-color: transparent;
             outline: none;
             color: var(--df-ziji);
+            text-align: center;
+            max-width: 260px;
         }
-        .login-container input:focus{
-            border: 1px solid var(--df-04);
+
+        .login-container input:focus {
+            outline: 1px solid #0c8bfa;
+            background-color: var(--df-005);
         }
+
         .loginbtn {
             background-color: #007bff;
             color: white;
@@ -110,7 +115,8 @@
             margin-top: 15px;
             color: red;
         }
-        #themeToggle{
+
+        #themeToggle {
             width: 24px;
             height: 24px;
             background-color: transparent;
@@ -145,7 +151,7 @@
             const messageDiv = document.getElementById('message');
             messageDiv.textContent = '';
 
-            if(!password){return};
+            if (!password) { return };
 
             try {
                 const response = await fetch('/api/login', {
