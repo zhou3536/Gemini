@@ -13,9 +13,9 @@
 </head>
 
 <body>
-    
+
     <div class="nav">
-        
+
         <button class="hisbtn" id="history-b"></button>
 
         <select id="gemini-v" class="send-btn1">
@@ -24,7 +24,6 @@
             <option value="gemini-2.5-pro">Gemini-2.5-Pro</option>
         </select>
         <div class="btnbox">
-            <button id="installButton" style="display: none;"></button>
             <button class="dhdhbtn" onclick="opendhdh()"></button>
             <button class="theme-toggle" id="themeToggle"></button>
         </div>
@@ -160,6 +159,7 @@
             // 加载指定的聊天记录
             async function loadChatHistory(chatId) {
                 if (!chatId) return;
+                chatWindow.innerHTML = '';
                 try {
                     const response = await fetch(`/api/history/${chatId}`);
                     if (!response.ok) {
@@ -390,6 +390,10 @@
     <script src="script.js"></script>
     <script src="script2.js"></script>
     <script src="script3.js"></script>
+    <!-- 预加载 -->
+    <div style="display: none;">
+        <img src="img/cbl-2.png" alt="">
+    </div>
 </body>
 
 </html>
