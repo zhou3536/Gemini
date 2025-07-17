@@ -92,24 +92,28 @@ document.addEventListener('DOMContentLoaded', function () {
             a.style.width = '300px';
             a.style.borderWidth = '1px';
             a.style.transition = 'all 0.3s ease';
+            opbtn.classList.add('hisbtn2');
             historylistdsiplay = true;
         } else if (historylistdsiplay) {
             a.style.width = '0';
             a.style.borderWidth = '0';
+            opbtn.classList.remove('hisbtn2');
             historylistdsiplay = false;
         }
     });
-    document.addEventListener('click', (event) => {
-        const ListOpen = a.style.width !== '0';
-        const isClickOnOpenButton = opbtn.contains(event.target);
-        if (ListOpen && !isClickOnOpenButton) {
-            a.style.width = '0';
-            a.style.borderWidth = '0';
-            a.style.transition = 'none';
-            historylistdsiplay = false;
-        }
-    });
+
 });
+function closehislist() {
+    const a = document.getElementById("history-list");
+    const opbtn = document.getElementById("history-b");
+    if (window.innerWidth < 800) {
+        a.style.width = '0';
+        a.style.borderWidth = '0';
+        a.style.transition = 'none';
+        opbtn.classList.remove('hisbtn2');
+        historylistdsiplay = false;
+    }
+};
 //缓存选择
 const modelSelect = document.getElementById('gemini-v');
 modelSelect.addEventListener('change', function () {

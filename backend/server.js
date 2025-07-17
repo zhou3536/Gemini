@@ -43,7 +43,12 @@ app.use(express.json());
 initializeAuth(app, process.env.accessPassword, process.env.cookieSecret);
 
 // 静态文件服务
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
+const tenMin = 10 * 60 * 1000;
+app.use(express.static(path.join(__dirname, 'public'), {
+    maxAge: tenMin,
+    etag: true,
+}));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
 const upload = multer({ dest: UPLOADS_DIR });

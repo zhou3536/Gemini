@@ -13,29 +13,31 @@
 </head>
 
 <body>
-    <div id="welcome">探索无界限</div>
+    
     <div class="nav">
-        <button class="theme-toggle" id="themeToggle"></button>
         
+        <button class="hisbtn" id="history-b"></button>
+
         <select id="gemini-v" class="send-btn1">
             <option value="gemini-2.5-flash-lite-preview-06-17">Gemini-2.5-F-Lite</option>
             <option value="gemini-2.5-flash">Gemini-2.5-Flash</option>
             <option value="gemini-2.5-pro">Gemini-2.5-Pro</option>
         </select>
         <div class="btnbox">
-            <button id="installButton"></button>
+            <button id="installButton" style="display: none;"></button>
             <button class="dhdhbtn" onclick="opendhdh()"></button>
-            <button class="hisbtn" id="history-b"></button>
+            <button class="theme-toggle" id="themeToggle"></button>
         </div>
     </div>
     <div class="container">
         <ul id="history-list" class="list-1"></ul>
         <ul id="list-dhdh" class="list-1"></ul>
         <main class="chat-area" id="chat-area">
+            <div id="welcome">探索无界限</div>
             <div id="chat-window"></div>
             <div id="input-area" class="input-area">
                 <div id="file-preview-area" class="file-preview-area"></div>
-                <textarea id="prompt-input" placeholder="您的问题总能找到答案" rows="2"></textarea>
+                <textarea id="prompt-input" placeholder="问题总能找到答案..." rows="2"></textarea>
                 <input type="file" id="file-input" multiple style="display: none;">
                 <div class="send-box">
                     <div class="menu">
@@ -132,17 +134,14 @@
                     const histories = await response.json();
                     historyList.innerHTML = '';
                     const Title = document.createElement('div');
-                    const listTitle = document.createElement('h4');
-                    listTitle.textContent = '关闭列表';
                     const DelHistory = document.createElement('a');
                     DelHistory.textContent = '管理历史';
                     DelHistory.href = 'del.html';
                     const logout = document.createElement('a');
                     logout.textContent = '退出登录';
                     logout.addEventListener('click', () => { gmmlogout() });
-                    Title.appendChild(listTitle);
-                    Title.appendChild(DelHistory);
                     Title.appendChild(logout);
+                    Title.appendChild(DelHistory);
                     historyList.appendChild(Title);
                     histories.forEach(h => {
                         const li = document.createElement('li');
@@ -150,6 +149,7 @@
                         li.title = h.title;
                         li.dataset.chatId = h.chatId;
                         li.addEventListener('click', () => loadChatHistory(h.chatId));
+                        li.addEventListener('click', () => closehislist());
                         historyList.appendChild(li);
                     });
                 } catch (error) {
