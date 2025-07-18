@@ -107,7 +107,7 @@
                 if (!targetDiv) {
                     chatWindow.appendChild(messageDiv);
                 }
-                chatWindow.scrollTop = chatWindow.scrollHeight;
+                // chatWindow.scrollTop = chatWindow.scrollHeight;
                 return messageDiv;
             }
 
@@ -372,8 +372,8 @@
             newChatBtn.addEventListener('click', () => {
                 localStorage.removeItem('currentActiveChatId');
                 currentChatId = null;
-                chatWindow.innerHTML = '';
                 renderChatHistory([]);
+                chatWindow.offsetHeight;
             });
 
             // --- 初始化

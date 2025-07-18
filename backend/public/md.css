@@ -1,5 +1,6 @@
 [data-theme="light"] {
-    --perbgc: #f9f9f9;
+    --perbgc: #c3c3c31a;
+    /* --perbgc: #f9f9f9; */
     --per-df: #2c3e50;
     --code: #002b82;
     --hljs-string: #718c00;
@@ -10,7 +11,8 @@
 }
 
 [data-theme="dark"] {
-    --perbgc: #282a2c;
+    /* --perbgc: #282a2c; */
+    --perbgc: #5c626833;
     --per-df: #eee;
     --code: #abe2ff;
     --hljs-string: #b0c461;
