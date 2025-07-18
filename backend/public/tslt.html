@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="color.css">
+    <title>Simple Translator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--bodybgc);
+            color: var(--df-ziji);
+            -webkit-tap-highlight-color: transparent;
+            font-family: Arial, sans-serif;
+            transition:
+                background-color 0.3s ease-in-out,
+                color 0.3s ease-in-out;
+        }
+
+        .container {
+            position: relative;
+            max-width: 600px;
+            margin: 20px auto;
+            background: var(--df-005);
+            padding: 30px;
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .text {
+            display: block;
+            border: 1px solid var(--df-02);
+            outline: none;
+            font-size: 16px;
+            border-radius: 5px;
+            color: var(--df-ziji);
+            resize: none;
+            padding: 8px;
+            margin: 12px 0;
+            width: 100%;
+            background-color: transparent;
+            min-height: 150px;
+            font-family: Arial, sans-serif;
+        }
+
+        .text:focus {
+            outline: 1px solid var(--df-03);
+        }
+
+        #send {
+            display: block;
+            width: 180px;
+            padding: 12px;
+            background-color: #297dd6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 10px auto;
+        }
+
+        #send:hover {
+            background-color: #0056b3;
+        }
+
+        #send:disabled {
+            cursor: not-allowed;
+            opacity: 0.3;
+        }
+
+        .error {
+            color: rgba(255, 21, 21, 0.777);
+            font-weight: 600;
+        }
+
+        .error::placeholder {
+            color: rgba(255, 96, 96, 0.777);
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                min-height: 100dvh;
+                padding: 10px;
+            }
+        }
+
+        #themeToggle {
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            width: 30px;
+            height: 30px;
+            background-color: transparent;
+            border: none;
+            margin-right: 5px;
+            vertical-align: middle
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <button id="themeToggle"></button>
+        <h1>Translator</h1>
+        <textarea id="textToTranslate" class="text" placeholder="输入内容..."></textarea>
+        <button onclick="translateText()" id="send">中文 ⇆ English</button>
+        <!-- <div id="result" class="result">输出结果...</div> -->
+        <textarea id="result" class="text" placeholder="输出内容..."></textarea>
+    </div>
+    <script src="theme.js"></script>
+    <script>
+
+        const inputElement = document.getElementById('targetLanguage');
+        const languageSpans = document.querySelectorAll('.language span');
+        languageSpans.forEach(span => {
+            span.addEventListener('click', function () {
+                const selectedLanguage = this.textContent;
+
+                inputElement.value = selectedLanguage;
+            });
+        });
+
+
+        async function translateText() {
+            const sendbtn = document.getElementById('send');
+            const text = document.getElementById('textToTranslate').value;
+            const textDiv = document.getElementById('textToTranslate');
+            const resultDiv = document.getElementById('result');
+            const sendmessage = 'Translate this content (Chinese/English) and give me only the translated text:' + text;
+            console.log(sendmessage);
+
+            if (!text) {
+                textDiv.classList.add('error');
+                textDiv.placeholder = '请输入内容...';
+                setTimeout(() => { textDiv.classList.remove('error'); }, 1000);
+                return;
+            }
+            sendbtn.disabled = true;
+            resultDiv.value = 'Translating...';
+            resultDiv.classList.remove('error');
+            try {
+                const response = await fetch('/api/translator', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sendmessage }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.value = data.translatedText;
+                } else {
+                    resultDiv.value = `Error: ${data.error || 'An unknown error occurred.'}`;
+                    resultDiv.classList.add('error');
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                resultDiv.value = `Network error: ${error.message}`;
+                resultDiv.classList.add('error');
+            } finally {
+                sendbtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

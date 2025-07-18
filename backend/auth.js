@@ -77,6 +77,8 @@ const authenticateMiddleware = (req, res, next) => {
     if (req.path === '/login.html' ||
         req.path === '/api/login' ||
         req.path === '/api/logout' ||
+        req.path === '/theme.js' ||
+        req.path === '/color.css' ||
         req.path === '/favicon.ico' ||
         req.path === '/manifest.json') {
         return next();

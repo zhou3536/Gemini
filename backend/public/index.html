@@ -7,6 +7,7 @@
     <title>MyGemini</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="md.css">
+    <link rel="stylesheet" href="color.css">
     <script src="highlight.min.js"></script>
     <script src="marked.min.js"></script>
     <!-- <link rel="manifest" href="/manifest.json"> -->
@@ -234,6 +235,8 @@
                     }
 
                     promptInput.value = '';
+                    promptInput.style.height = '0';
+                    promptInput.style.height = promptInput.scrollHeight + 'px';
                     selectedFiles = [];
                     renderFilePreviews();
 
@@ -389,6 +392,7 @@
     </script>
     <script src="script.js"></script>
     <script src="script2.js"></script>
+    <script src="theme.js"></script>
 
     <!-- 预加载 -->
     <div style="display: none;">

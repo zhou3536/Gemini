@@ -285,6 +285,31 @@ async function executeChat(jobId) {
     }
 }
 
+// --- 简单接口 ---
+app.post('/api/Simplechat', async (req, res) => {
+    const { sendmessage } = req.body;
+
+    if (!sendmessage) {
+        return res.status(400).json({ error: 'There is no information' });
+    }
+
+    try {
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite-preview-06-17" });
+
+        // const prompt = `Translate the following text to ${targetLanguage}: "${text}"`;
+        const prompt = sendmessage;
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const translatedText = response.text();
+
+        res.json({ translatedText });
+
+    } catch (error) {
+        console.error('Translation API error:', error);
+        res.status(500).json({ error: `Translation failed: ${error.message}` });
+    }
+});
+
 // 获取历史列表
 app.get('/api/history', async (req, res) => {
     try {

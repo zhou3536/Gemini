@@ -1,0 +1,26 @@
+[data-theme="light"] {
+    /* --bodybgc: #F0F8FF; */
+    --bodybgc: #FFF;
+    --navbgc: linear-gradient(to right, #58AADD 0%, #DB5C7F 100%);
+    --chatbgc: rgba(255, 255, 255, 0.5);
+    --hisbgc: #f3f3f3;
+    --df-ziji: #111;
+    --df-005: rgba(0, 0, 0, 0.05);
+    --df-01: rgba(0, 0, 0, 0.1);
+    --df-02: rgba(0, 0, 0, 0.2);
+    --df-03: rgba(0, 0, 0, 0.3);
+    --df-04: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] {
+    --bodybgc: #1b1c1d;
+    --navbgc: linear-gradient(to right, #58aadd80 0%, #DB5C7F80 100%);
+    --chatbgc: rgba(255, 255, 255, 0.02);
+    --hisbgc: #1b1c1d;
+    --df-ziji: #eee;
+    --df-005: rgba(255, 255, 255, 0.1);
+    --df-01: rgba(255, 255, 255, 0.2);
+    --df-02: rgba(255, 255, 255, 0.3);
+    --df-03: rgba(255, 255, 255, 0.4);
+    --df-04: rgba(255, 255, 255, 0.5);
+}
