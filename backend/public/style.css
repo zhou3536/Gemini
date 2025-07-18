@@ -480,9 +480,9 @@ body {
 
 .menu .SearchON {
     border: none;
-    color: #000;
+    color: var(--df-ziji);
     border: 1px solid #5aaaff;
-    background: linear-gradient(to right, #c8eaff 0%, #ffd4e0 100%);
+    background: linear-gradient(to right, #58aadd80 0%, #DB5C7F80 100%);
 }
 
 #send-btn {
