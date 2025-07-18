@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="md.css">
     <script src="highlight.min.js"></script>
     <script src="marked.min.js"></script>
-    <link rel="manifest" href="/manifest.json">
+    <!-- <link rel="manifest" href="/manifest.json"> -->
 </head>
 
 <body>
@@ -36,7 +36,7 @@
             <div id="chat-window"></div>
             <div id="input-area" class="input-area">
                 <div id="file-preview-area" class="file-preview-area"></div>
-                <textarea id="prompt-input" placeholder="问题总会有答案..." rows="2"></textarea>
+                <textarea id="prompt-input" placeholder="问题总会有答案..." rows="1"></textarea>
                 <input type="file" id="file-input" multiple style="display: none;">
                 <div class="send-box">
                     <div class="menu">
@@ -137,10 +137,10 @@
                     DelHistory.textContent = '管理历史';
                     DelHistory.href = 'del.html';
                     const logout = document.createElement('a');
-                    logout.textContent = '退出登录';
+                    logout.textContent = '注销登录';
                     logout.addEventListener('click', () => { gmmlogout() });
-                    Title.appendChild(logout);
                     Title.appendChild(DelHistory);
+                    Title.appendChild(logout);
                     historyList.appendChild(Title);
                     histories.forEach(h => {
                         const li = document.createElement('li');

@@ -206,3 +206,15 @@ const themeToggle = {
 
 // 初始化
 themeToggle.themeinit();
+
+
+// 动态调整输入框高度
+promptInput.addEventListener('input', function() {
+    this.style.height = '0';
+    this.style.height = this.scrollHeight + 'px'; 
+});
+
+window.addEventListener('load', () => {
+    promptInput.style.height = '0';
+    promptInput.style.height = promptInput.scrollHeight + 'px';
+});

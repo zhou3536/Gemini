@@ -150,7 +150,10 @@
             const messageDiv = document.getElementById('message');
             messageDiv.textContent = '';
 
-            if (!password) { return };
+            if (!password) {
+                messageDiv.textContent = '请输入密码';
+                return
+            };
 
             try {
                 const response = await fetch('/api/login', {
@@ -165,12 +168,12 @@
 
                 if (response.ok) {
                     messageDiv.style.color = 'green';
-                    messageDiv.textContent = data.message || 'Successful!';
-                    // 登录成功后，重定向到主页或之前的页面
-                    window.location.href = '/'; // 或者 window.location.reload();
+                    messageDiv.textContent = data.message || '登录成功';
+
+                    window.location.href = '/';
                 } else {
                     messageDiv.style.color = 'red';
-                    messageDiv.textContent = data.message || 'Login failed.';
+                    messageDiv.textContent = data.message || '登录失败';
                 }
             } catch (error) {
                 console.error('Error during login:', error);
