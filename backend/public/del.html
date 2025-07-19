@@ -82,8 +82,7 @@
 
         .time {
             font-size: 12px;
-            margin-top: 5px;
-            margin-left: 2px;
+            margin: 0 5px 0 2px;
         }
 
         button {
@@ -168,14 +167,19 @@
                     const divbox = document.createElement('div');
                     const title = document.createElement('div');
                     const formattedDate = formatTimestampToDateTime(item.chatId);
-                    const time = document.createElement('div');
+                    const time = document.createElement('span');
+                    const chatId = document.createElement('span');
+
                     divbox.classList.add('divbox')
                     title.textContent = `${index + 1}. ${item.title}`;
                     title.classList.add('title');
                     time.innerText = formattedDate;
                     time.classList.add('time');
+                    chatId.innerText = `ID: ${item.chatId}`;
+                    chatId.classList.add('time');
                     divbox.appendChild(title);
                     divbox.appendChild(time);
+                    divbox.appendChild(chatId);
 
                     listItem.appendChild(divbox);
 
